@@ -10,46 +10,17 @@ from ai_engine import generate_ai_signal
 
 st.set_page_config(page_title="Kite AI Analyzer", layout="wide")
 
-# ===== KITE CONFIG =====
+# ===== CONFIG =====
 API_KEY = st.secrets["API_KEY"]
 API_SECRET = st.secrets["API_SECRET"]
 
 kite = KiteConnect(api_key=API_KEY)
 
-# ===== LOAD SAVED TOKEN (OPTIONAL LOCAL) =====
-if "access_token" not in st.session_state and os.path.exists("access_token.txt"):
-    with open("access_token.txt") as f:
-        st.session_state["access_token"] = f.read().strip()
+# ===== HANDLE REQUEST TOKEN FIRST (CRITICAL) =====
+params = st.query_params
 
-# ===== VALIDATE TOKEN =====
-kite_obj = None
-
-if "access_token" in st.session_state:
+if "request_token" in params and "access_token" not in st.session_state:
     try:
-        kite.set_access_token(st.session_state["access_token"])
-        kite.profile()  # validate
-        kite_obj = kite
-    except:
-        st.session_state.pop("access_token", None)
-
-# ===== LOGIN FLOW =====
-if kite_obj is None:
-
-    login_url = kite.login_url()
-
-    st.title("🔐 Login Required")
-
-    st.markdown(f"""
-    <a href="{login_url}" target="_self">
-        <button style="padding:12px 24px; font-size:18px;">
-            Login with Zerodha
-        </button>
-    </a>
-    """, unsafe_allow_html=True)
-
-    params = st.query_params
-
-    if "request_token" in params:
         data = kite.generate_session(
             params["request_token"],
             api_secret=API_SECRET
@@ -57,15 +28,47 @@ if kite_obj is None:
 
         st.session_state["access_token"] = data["access_token"]
 
-        # Save locally (optional)
-        with open("access_token.txt", "w") as f:
-            f.write(data["access_token"])
-
-        # 🔥 FIX: clear URL params to avoid loop
+        # Clear URL params to avoid infinite loop
         st.query_params.clear()
 
         st.success("✅ Login successful")
         st.rerun()
+
+    except Exception as e:
+        st.error("❌ Login failed. Try again.")
+        st.query_params.clear()
+        st.stop()
+
+# ===== VALIDATE TOKEN =====
+kite_obj = None
+
+if "access_token" in st.session_state:
+    try:
+        kite.set_access_token(st.session_state["access_token"])
+        kite.profile()  # validate token
+        kite_obj = kite
+    except:
+        st.session_state.pop("access_token", None)
+
+# ===== LOGIN SCREEN =====
+if kite_obj is None:
+
+    login_url = kite.login_url()
+
+    st.title("🔐 Login Required")
+
+    st.markdown("""
+    Use your Zerodha Client ID or Mobile Number.
+    Email login is not supported.
+    """)
+
+    st.markdown(f"""
+    <a href="{login_url}" target="_self">
+        <button style="padding:12px 24px; font-size:16px;">
+            Login with Zerodha
+        </button>
+    </a>
+    """, unsafe_allow_html=True)
 
     st.stop()
 
@@ -75,16 +78,10 @@ st.title("📊 Kite AI Options Analyzer")
 # Sidebar
 auto_refresh = st.sidebar.checkbox("Auto Refresh (1 min)", value=True)
 
-# ===== LOGOUT (FIXED) =====
+# ===== LOGOUT =====
 if st.sidebar.button("Logout"):
-
     st.session_state.clear()
-
-    if os.path.exists("access_token.txt"):
-        os.remove("access_token.txt")
-
     st.query_params.clear()
-
     st.success("Logged out successfully")
     st.rerun()
 
@@ -97,7 +94,7 @@ if result is None:
 
 df, atm_strike, spot = result
 
-# ===== NIFTY DISPLAY =====
+# ===== DISPLAY =====
 st.subheader("📊 NIFTY Live")
 
 colA, colB = st.columns(2)
@@ -131,7 +128,7 @@ col2.metric("Support", int(support))
 col3.metric("Resistance", int(resistance))
 col4.metric("Trend", sentiment)
 
-# ===== AI INSIGHT CARD =====
+# ===== AI INSIGHT =====
 st.subheader("🧠 AI Insight")
 
 st.markdown(f"""
@@ -159,7 +156,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ===== OI CHART =====
+# ===== CHART =====
 st.subheader("📊 OI Comparison")
 
 fig = go.Figure()
@@ -189,8 +186,6 @@ fig.add_vline(
 
 fig.update_layout(
     barmode="group",
-    xaxis_title="Strike",
-    yaxis_title="OI",
     template="plotly_dark",
     height=400
 )
