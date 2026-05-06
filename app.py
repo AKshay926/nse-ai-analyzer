@@ -22,61 +22,28 @@ st.markdown("""
     background-image:
     linear-gradient(
         rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.90)
+        rgba(0, 0, 0, 0.65)
     ),
-    url("https://images.unsplash.com/photo-1642790106117-e829e14a795f");
+    url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* REMOVE HEADER BACKGROUND */
+/* REMOVE HEADER */
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
 
 /* SIDEBAR */
 [data-testid="stSidebar"] {
-    background-color: rgba(10,10,10,0.92);
+    background-color: rgba(10,10,10,0.88);
 }
 
-/* TEXT COLORS */
+/* TEXT */
 h1, h2, h3, h4, h5, h6, p, div, label {
     color: white !important;
-}
-
-/* METRIC CARDS */
-[data-testid="metric-container"] {
-    background-color: rgba(20,20,20,0.75);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 15px;
-    border-radius: 14px;
-}
-
-/* DATAFRAME */
-[data-testid="stDataFrame"] {
-    background-color: rgba(20,20,20,0.75);
-}
-
-/* BUTTONS */
-.stButton>button {
-    background-color: #0f62fe;
-    color: white;
-    border-radius: 10px;
-    border: none;
-    padding: 10px 18px;
-    font-weight: 600;
-}
-
-.stButton>button:hover {
-    background-color: #1f70ff;
-}
-
-/* INFO BOX */
-[data-testid="stAlert"] {
-    background-color: rgba(20,20,20,0.85);
-    border-radius: 12px;
 }
 
 </style>
