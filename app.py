@@ -33,7 +33,7 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* ================= REMOVE HEADER ================= */
+/* ================= REMOVE STREAMLIT HEADER ================= */
 
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
@@ -85,7 +85,7 @@ p, div, label, span {
     border-radius: 14px;
 }
 
-/* ================= BUTTON ================= */
+/* ================= BUTTONS ================= */
 
 .stButton > button {
     background: linear-gradient(90deg,#2563eb,#1d4ed8);
@@ -106,6 +106,61 @@ p, div, label, span {
     border-radius: 10px;
 }
 
+/* ================= LOGIN PAGE ================= */
+
+.top-right-brand {
+    position: fixed;
+    top: 70px;
+    right: 40px;
+    text-align: right;
+    z-index: 999;
+}
+
+.brand-title {
+    color: white;
+    font-size: 58px;
+    font-style: italic;
+    font-weight: 800;
+    text-shadow: 0 0 18px rgba(0,0,0,0.7);
+}
+
+.brand-subtitle {
+    color: rgba(255,255,255,0.82);
+    font-size: 14px;
+    margin-top: -6px;
+    letter-spacing: 0.5px;
+}
+
+.bottom-left {
+    position: fixed;
+    bottom: 90px;
+    left: 40px;
+    z-index: 999;
+}
+
+.feature-points {
+    color: white;
+    font-size: 20px;
+    line-height: 2;
+    margin-bottom: 18px;
+    text-shadow: 0 0 18px rgba(0,0,0,0.8);
+}
+
+.login-btn {
+    background: rgba(37,99,235,0.92);
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    opacity: 0.92;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -115,7 +170,7 @@ API_SECRET = st.secrets["API_SECRET"]
 
 kite = KiteConnect(api_key=API_KEY)
 
-# ================= SESSION INIT =================
+# ================= SESSION =================
 if "access_token" not in st.session_state:
     st.session_state["access_token"] = None
 
@@ -130,7 +185,6 @@ if "request_token" in st.query_params:
 
     try:
 
-        # ALREADY LOGGED IN
         if st.session_state.get("logged_in"):
 
             st.query_params.clear()
@@ -150,12 +204,10 @@ if "request_token" in st.query_params:
 
         kite.set_access_token(access_token)
 
-        # SAVE SESSION
         st.session_state["access_token"] = access_token
         st.session_state["logged_in"] = True
         st.session_state["validated"] = True
 
-        # REMOVE TOKEN FROM URL
         st.query_params.clear()
 
         st.success("✅ Login Successful")
@@ -191,70 +243,8 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    login_html = f"""
-    <style>
-
-    .hero-container {{
-        position: relative;
-        height: 82vh;
-    }}
-
-    .top-right-brand {{
-        position: absolute;
-        top: 10px;
-        right: 30px;
-        text-align: right;
-    }}
-
-    .brand-title {{
-        color: white;
-        font-size: 58px;
-        font-style: italic;
-        font-weight: 800;
-        text-shadow: 0 0 18px rgba(0,0,0,0.7);
-    }}
-
-    .brand-subtitle {{
-        color: rgba(255,255,255,0.82);
-        font-size: 14px;
-        margin-top: -6px;
-        letter-spacing: 0.5px;
-    }}
-
-    .bottom-left {{
-        position: absolute;
-        bottom: 90px;
-        left: 25px;
-    }}
-
-    .feature-points {{
-        color: white;
-        font-size: 20px;
-        line-height: 2;
-        margin-bottom: 18px;
-        text-shadow: 0 0 18px rgba(0,0,0,0.8);
-    }}
-
-    .login-btn {{
-        background: rgba(37,99,235,0.92);
-        color: white;
-        padding: 8px 18px;
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 9px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        backdrop-filter: blur(8px);
-    }}
-
-    .login-btn:hover {{
-        opacity: 0.92;
-    }}
-
-    </style>
-
-    <div class="hero-container">
-
+    st.markdown(
+        f"""
         <div class="top-right-brand">
 
             <div class="brand-title">
@@ -283,11 +273,9 @@ if not st.session_state["logged_in"]:
             </a>
 
         </div>
-
-    </div>
-    """
-
-    st.markdown(login_html, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
     st.stop()
 
@@ -379,7 +367,7 @@ except Exception:
     sentiment = "Neutral"
     insight = ai_msg
 
-# ================= METRICS =================
+# ================= DISPLAY METRICS =================
 col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("PCR", round(pcr, 2))
