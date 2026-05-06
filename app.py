@@ -21,7 +21,7 @@ st.markdown("""
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.58),
+        rgba(0, 0, 0, 0.55),
         rgba(0, 0, 0, 0.90)
     ),
     url("https://images.unsplash.com/photo-1642790106117-e829e14a795f");
@@ -178,10 +178,10 @@ if not st.session_state["logged_in"]:
 
     ### *Real-Time Option Chain Intelligence for Smarter Trading*
 
-    🔐 Secure Zerodha Login *(Once Daily)*
-
     📈 Live Market Analytics  
     🧠 AI-Powered Options Insights
+
+    🔐 Secure Zerodha Login *(Once Daily)*                      
     """)
 
     st.markdown(
