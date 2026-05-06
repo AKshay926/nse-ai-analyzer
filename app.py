@@ -21,7 +21,7 @@ st.markdown("""
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.65),
+        rgba(0, 0, 0, 0.58),
         rgba(0, 0, 0, 0.90)
     ),
     url("https://images.unsplash.com/photo-1642790106117-e829e14a795f");
