@@ -13,16 +13,17 @@ st.set_page_config(
     layout="wide"
 )
 
-# ================= CUSTOM STYLING =================
+# ================= CUSTOM CSS =================
 st.markdown("""
 <style>
 
-/* MAIN BACKGROUND */
+/* ================= MAIN BACKGROUND ================= */
+
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.65)
+        rgba(0, 0, 0, 0.45),
+        rgba(0, 0, 0, 0.60)
     ),
     url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
 
@@ -31,21 +32,62 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* REMOVE HEADER */
+/* ================= REMOVE STREAMLIT HEADER ================= */
+
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
 
-/* SIDEBAR */
+/* ================= SIDEBAR ================= */
+
 [data-testid="stSidebar"] {
     background-color: rgba(10,10,10,0.88);
 }
 
-/* TEXT */
+/* ================= TEXT COLORS ================= */
+
 h1, h2, h3, h4, h5, h6, p, div, label {
     color: white !important;
 }
-            
+
+/* ================= METRIC CARDS ================= */
+
+[data-testid="metric-container"] {
+    background-color: rgba(20,20,20,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 14px;
+}
+
+/* ================= DATAFRAME ================= */
+
+[data-testid="stDataFrame"] {
+    background-color: rgba(20,20,20,0.72);
+    border-radius: 12px;
+}
+
+/* ================= BUTTONS ================= */
+
+.stButton>button {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+
+.stButton>button:hover {
+    background-color: #1d4ed8;
+}
+
+/* ================= INFO BOX ================= */
+
+[data-testid="stAlert"] {
+    background-color: rgba(20,20,20,0.85);
+    border-radius: 12px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -141,34 +183,77 @@ if not st.session_state["logged_in"]:
     login_url = kite.login_url()
 
     st.markdown("""
-    # ***⚡ PulseIQ***
+    <div style="
+        margin-top: -10px;
+        margin-left: 30px;
+    ">
 
-    ### *Real-Time Option Chain Intelligence for Smarter Trading*
-                
-    📈 Live Market Analytics  
-    🧠 AI-Powered Options Insights
+        <h1 style="
+            color:white;
+            font-size:62px;
+            margin-bottom:0px;
+            font-style:italic;
+            font-weight:800;
+        ">
+            ⚡ PulseIQ
+        </h1>
 
-    🔐 Secure Zerodha Login *(Once Daily)*
-    """)
+        <p style="
+            color:white;
+            font-size:20px;
+            margin-top:5px;
+            font-style:italic;
+            opacity:0.92;
+        ">
+            Real-Time Option Chain Intelligence for Smarter Trading
+        </p>
+
+        <div style="
+            margin-top:35px;
+            font-size:18px;
+            line-height:2;
+            color:white;
+        ">
+            📈 Live Market Analytics<br>
+            🧠 AI-Powered Options Insights
+        </div>
+
+        <div style="
+            margin-top:25px;
+            font-size:16px;
+            color:white;
+            opacity:0.9;
+        ">
+            🔐 Secure Zerodha Login <i>(Once Daily)</i>
+        </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ================= LOGIN BUTTON =================
 
     st.markdown(
         f"""
-        <a href="{login_url}" target="_self">
-            <button style="
-                background-color:#0f62fe;
-                color:white;
-                padding:14px 28px;
-                border:none;
-                border-radius:12px;
-                font-size:18px;
-                width:100%;
-                cursor:pointer;
-                font-weight:600;
-                margin-top:20px;
-            ">
-                🔐 Login with Zerodha
-            </button>
-        </a>
+        <div style="
+            margin-top:35px;
+            margin-left:30px;
+        ">
+            <a href="{login_url}" target="_self">
+                <button style="
+                    background-color:#2563eb;
+                    color:white;
+                    padding:14px 34px;
+                    border:none;
+                    border-radius:14px;
+                    font-size:18px;
+                    cursor:pointer;
+                    font-weight:700;
+                    box-shadow:0 0 20px rgba(37,99,235,0.35);
+                ">
+                    🔐 Login with Zerodha
+                </button>
+            </a>
+        </div>
         """,
         unsafe_allow_html=True
     )
