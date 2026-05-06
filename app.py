@@ -111,17 +111,33 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 }
 
 .login-btn {
-    background: rgba(37,99,235,0.92);
+    background: linear-gradient(
+        135deg,
+        rgba(37,99,235,0.95),
+        rgba(29,78,216,0.95)
+    );
+
     color: white;
-    padding: 8px 18px;
-    border: none;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 10px 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
+
+    box-shadow:
+        0 0 18px rgba(37,99,235,0.28);
+
+    transition: all 0.25s ease;
 }
 
-.login-btn:hover { opacity: 0.92; }
+.login-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 28px rgba(37,99,235,0.45);
+}
 
 </style>
 """, unsafe_allow_html=True)
