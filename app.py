@@ -161,7 +161,7 @@ if not st.session_state["logged_in"]:
                 border:none;
                 border-radius:12px;
                 font-size:18px;
-                width:100%;
+                width:60%;
                 cursor:pointer;
                 font-weight:600;
                 margin-top:20px;
