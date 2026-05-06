@@ -88,7 +88,9 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 
 .brand-subtitle {
     color: rgba(255,255,255,0.82);
-    font-size: 14px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    opacity: 0.82;
     margin-top: -6px;
     letter-spacing: 0.5px;
 }
