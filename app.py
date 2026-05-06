@@ -2,7 +2,6 @@ import streamlit as st
 import time
 import plotly.graph_objects as go
 from kiteconnect import KiteConnect
-import os
 
 from kite_fetch import fetch_option_chain
 from analysis import calculate_metrics
@@ -16,10 +15,17 @@ API_SECRET = st.secrets["API_SECRET"]
 
 kite = KiteConnect(api_key=API_KEY)
 
-# ===== HANDLE REQUEST TOKEN FIRST (CRITICAL) =====
+# ===== INIT SESSION =====
+if "access_token" not in st.session_state:
+    st.session_state["access_token"] = None
+
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+# ===== HANDLE LOGIN TOKEN =====
 params = st.query_params
 
-if "request_token" in params and "access_token" not in st.session_state:
+if "request_token" in params and not st.session_state["logged_in"]:
     try:
         data = kite.generate_session(
             params["request_token"],
@@ -27,39 +33,41 @@ if "request_token" in params and "access_token" not in st.session_state:
         )
 
         st.session_state["access_token"] = data["access_token"]
+        st.session_state["logged_in"] = True
 
-        # Clear URL params to avoid infinite loop
+        # Clear params to avoid loop
         st.query_params.clear()
 
         st.success("✅ Login successful")
         st.rerun()
 
     except Exception as e:
-        st.error("❌ Login failed. Try again.")
+        st.error("❌ Login failed")
         st.query_params.clear()
         st.stop()
 
-# ===== VALIDATE TOKEN =====
+# ===== VALIDATE SESSION =====
 kite_obj = None
 
-if "access_token" in st.session_state:
+if st.session_state["access_token"]:
     try:
         kite.set_access_token(st.session_state["access_token"])
-        kite.profile()  # validate token
+        kite.profile()
         kite_obj = kite
+        st.session_state["logged_in"] = True
     except:
-        st.session_state.pop("access_token", None)
+        st.session_state["access_token"] = None
+        st.session_state["logged_in"] = False
 
 # ===== LOGIN SCREEN =====
-if kite_obj is None:
-
+if not st.session_state["logged_in"]:
     login_url = kite.login_url()
 
     st.title("🔐 Login Required")
 
     st.markdown("""
-    Use your Zerodha Client ID or Mobile Number.
-    Email login is not supported.
+    👉 Login using Zerodha Client ID or Mobile Number  
+    🔒 Login required once per day
     """)
 
     st.markdown(f"""
@@ -82,7 +90,6 @@ auto_refresh = st.sidebar.checkbox("Auto Refresh (1 min)", value=True)
 if st.sidebar.button("Logout"):
     st.session_state.clear()
     st.query_params.clear()
-    st.success("Logged out successfully")
     st.rerun()
 
 # ===== LOAD DATA =====
@@ -106,88 +113,78 @@ pcr, support, resistance = calculate_metrics(df)
 ai_msg = generate_ai_signal(pcr, support, resistance)
 
 lines = [line.strip() for line in ai_msg.split("\n") if line.strip()]
-sentiment_line = lines[0] if lines else ""
-sentiment = sentiment_line.replace("📊 Market Sentiment:", "").strip()
-insight = lines[-1] if len(lines) > 1 else ""
-
-# Color logic
-if "Bullish" in sentiment:
-    color = "#00ff9f"
-    emoji = "🟢"
-elif "Bearish" in sentiment:
-    color = "#ff4b4b"
-    emoji = "🔴"
-else:
-    color = "#f1c40f"
-    emoji = "🟡"
+sentiment = lines[0].replace("📊 Market Sentiment:", "").strip()
+insight = lines[-1]
 
 col1, col2, col3, col4 = st.columns(4)
-
 col1.metric("PCR", round(pcr, 2))
 col2.metric("Support", int(support))
 col3.metric("Resistance", int(resistance))
 col4.metric("Trend", sentiment)
 
-# ===== AI INSIGHT =====
-st.subheader("🧠 AI Insight")
+# ===== TOTAL OI =====
+total_call = df["Call OI"].sum()
+total_put = df["Put OI"].sum()
 
-st.markdown(f"""
-<div style="
-    background-color:#111;
-    padding:16px;
-    border-radius:12px;
-    border-left:5px solid {color};
-    font-size:13px;
-">
+st.subheader("📊 OI Strength")
 
-<div style="font-size:15px; font-weight:bold; color:{color}; margin-bottom:8px;">
-{emoji} {sentiment}
-</div>
-
-<div style="display:flex; gap:40px; margin-bottom:10px;">
-    <div>📉 <b>Support</b><br>{int(support)}</div>
-    <div>📈 <b>Resistance</b><br>{int(resistance)}</div>
-</div>
-
-<div style="opacity:0.85;">
-💡 {insight}
-</div>
-
-</div>
-""", unsafe_allow_html=True)
+colX, colY = st.columns(2)
+colX.metric("🔴 Total Call OI", f"{int(total_call):,}")
+colY.metric("🟢 Total Put OI", f"{int(total_put):,}")
 
 # ===== CHART =====
-st.subheader("📊 OI Comparison")
+st.subheader("📊 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
+# CALL = RED
 fig.add_trace(go.Bar(
     x=df["Strike"],
     y=df["Call OI"],
     name="Call OI",
-    marker_color="red"
+    marker_color="red",
+    opacity=0.6
 ))
 
+# PUT = GREEN
 fig.add_trace(go.Bar(
     x=df["Strike"],
     y=df["Put OI"],
     name="Put OI",
-    marker_color="green"
+    marker_color="green",
+    opacity=0.6
 ))
 
+# TOTAL CALL LINE
+fig.add_trace(go.Scatter(
+    x=df["Strike"],
+    y=[total_call]*len(df),
+    name="Total Call",
+    mode="lines",
+    line=dict(color="red", width=4)
+))
+
+# TOTAL PUT LINE
+fig.add_trace(go.Scatter(
+    x=df["Strike"],
+    y=[total_put]*len(df),
+    name="Total Put",
+    mode="lines",
+    line=dict(color="green", width=4)
+))
+
+# ATM LINE
 fig.add_vline(
     x=atm_strike,
-    line_width=2,
     line_dash="dash",
     line_color="yellow",
-    annotation_text="ATM",
-    annotation_position="top"
+    annotation_text="ATM"
 )
 
 fig.update_layout(
     barmode="group",
     template="plotly_dark",
-    height=400
+    height=500
 )
 
 st.plotly_chart(fig, use_container_width=True)
