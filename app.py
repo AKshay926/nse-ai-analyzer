@@ -109,10 +109,13 @@ if not st.session_state["logged_in"]:
     st.title("🔐 Zerodha Login Required")
 
     st.markdown("""
-    ### Welcome to Kite AI Options Analyzer
+    
+# ⚡ PulseIQ
 
-    👉 Login using your Zerodha Client ID or Mobile Number  
-    🔒 Login required once daily
+### *Intelligence Behind Every Move*
+
+📈 Live Options Analytics  
+🧠 AI-Powered Market Signals
     """)
 
     # SAME TAB LOGIN
