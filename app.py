@@ -10,19 +10,21 @@ from ai_engine import generate_ai_signal
 # ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="PulseIQ",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# ================= CUSTOM STYLING =================
+# ================= CUSTOM CSS =================
 st.markdown("""
 <style>
 
-/* MAIN BACKGROUND */
+/* ================= BACKGROUND ================= */
+
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.65)
+        rgba(0,0,0,0.45),
+        rgba(0,0,0,0.72)
     ),
     url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
 
@@ -31,19 +33,77 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* REMOVE HEADER */
+/* ================= REMOVE HEADER ================= */
+
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
 
-/* SIDEBAR */
-[data-testid="stSidebar"] {
-    background-color: rgba(10,10,10,0.88);
+/* ================= REMOVE TOP SPACE ================= */
+
+.block-container {
+    padding-top: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
-/* TEXT */
-h1, h2, h3, h4, h5, h6, p, div, label {
+/* ================= SIDEBAR ================= */
+
+[data-testid="stSidebar"] {
+    background-color: rgba(10,10,10,0.92);
+}
+
+/* ================= TEXT ================= */
+
+h1, h2, h3, h4, h5, h6,
+p, div, label, span {
     color: white !important;
+}
+
+/* ================= METRIC CARDS ================= */
+
+[data-testid="metric-container"] {
+    background: rgba(20,20,20,0.72);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+}
+
+/* ================= DATAFRAME ================= */
+
+[data-testid="stDataFrame"] {
+    background: rgba(20,20,20,0.72);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* ================= INFO BOX ================= */
+
+[data-testid="stAlert"] {
+    background: rgba(20,20,20,0.80);
+    border-radius: 14px;
+}
+
+/* ================= BUTTON ================= */
+
+.stButton > button {
+    background: linear-gradient(90deg,#2563eb,#1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 10px;
 }
 
 </style>
@@ -65,31 +125,37 @@ if "logged_in" not in st.session_state:
 if "validated" not in st.session_state:
     st.session_state["validated"] = False
 
-# ================= QUERY PARAMS =================
-params = dict(st.query_params)
-
 # ================= LOGIN HANDLER =================
-if "request_token" in params and not st.session_state["logged_in"]:
+if "request_token" in st.query_params:
 
     try:
-        request_token = params["request_token"]
+
+        # ALREADY LOGGED IN
+        if st.session_state.get("logged_in"):
+
+            st.query_params.clear()
+            st.rerun()
+
+        request_token = st.query_params["request_token"]
 
         if isinstance(request_token, list):
             request_token = request_token[0]
 
         data = kite.generate_session(
-            request_token,
+            request_token=request_token,
             api_secret=API_SECRET
         )
 
-        st.session_state["access_token"] = data["access_token"]
+        access_token = data["access_token"]
+
+        kite.set_access_token(access_token)
+
+        # SAVE SESSION
+        st.session_state["access_token"] = access_token
         st.session_state["logged_in"] = True
-        st.session_state["validated"] = False
+        st.session_state["validated"] = True
 
-        kite.set_access_token(
-            data["access_token"]
-        )
-
+        # REMOVE TOKEN FROM URL
         st.query_params.clear()
 
         st.success("✅ Login Successful")
@@ -100,18 +166,10 @@ if "request_token" in params and not st.session_state["logged_in"]:
 
         st.error(f"❌ Login failed: {e}")
 
-        st.session_state["access_token"] = None
-        st.session_state["logged_in"] = False
-        st.session_state["validated"] = False
-
-        st.query_params.clear()
-
         st.stop()
 
 # ================= VALIDATE SESSION =================
-kite_obj = None
-
-if st.session_state["access_token"]:
+if st.session_state.get("access_token"):
 
     try:
 
@@ -119,59 +177,117 @@ if st.session_state["access_token"]:
             st.session_state["access_token"]
         )
 
-        # Validate only once
-        if not st.session_state["validated"]:
+        kite.profile()
 
-            kite.profile()
-
-            st.session_state["validated"] = True
-
-        kite_obj = kite
         st.session_state["logged_in"] = True
 
     except Exception:
 
-        st.session_state["access_token"] = None
         st.session_state["logged_in"] = False
-        st.session_state["validated"] = False
+        st.session_state["access_token"] = None
 
 # ================= LOGIN SCREEN =================
 if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    st.markdown("""
-    # ***⚡ PulseIQ***
+    login_html = f"""
+    <style>
 
-    ### *Real-Time Option Chain Intelligence for Smarter Trading*
+    .hero-container {{
+        position: relative;
+        height: 82vh;
+    }}
 
-    📈 Live Market Analytics  
-    🧠 AI-Powered Options Insights
+    .top-right-brand {{
+        position: absolute;
+        top: 10px;
+        right: 30px;
+        text-align: right;
+    }}
 
-    🔐 Secure Zerodha Login *(Once Daily)*                      
-    """)
+    .brand-title {{
+        color: white;
+        font-size: 58px;
+        font-style: italic;
+        font-weight: 800;
+        text-shadow: 0 0 18px rgba(0,0,0,0.7);
+    }}
 
-    st.markdown(
-        f"""
-        <a href="{login_url}" target="_self">
-            <button style="
-                background-color:#0f62fe;
-                color:white;
-                padding:14px 28px;
-                border:none;
-                border-radius:12px;
-                font-size:18px;
-                width:30%;
-                cursor:pointer;
-                font-weight:600;
-                margin-top:20px;
-            ">
-                🔐 Login with Zerodha
-            </button>
-        </a>
-        """,
-        unsafe_allow_html=True
-    )
+    .brand-subtitle {{
+        color: rgba(255,255,255,0.82);
+        font-size: 14px;
+        margin-top: -6px;
+        letter-spacing: 0.5px;
+    }}
+
+    .bottom-left {{
+        position: absolute;
+        bottom: 90px;
+        left: 25px;
+    }}
+
+    .feature-points {{
+        color: white;
+        font-size: 20px;
+        line-height: 2;
+        margin-bottom: 18px;
+        text-shadow: 0 0 18px rgba(0,0,0,0.8);
+    }}
+
+    .login-btn {{
+        background: rgba(37,99,235,0.92);
+        color: white;
+        padding: 8px 18px;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+    }}
+
+    .login-btn:hover {{
+        opacity: 0.92;
+    }}
+
+    </style>
+
+    <div class="hero-container">
+
+        <div class="top-right-brand">
+
+            <div class="brand-title">
+                ⚡ PulseIQ
+            </div>
+
+            <div class="brand-subtitle">
+                AI-Powered Option Chain Intelligence
+            </div>
+
+        </div>
+
+        <div class="bottom-left">
+
+            <div class="feature-points">
+                📈 Live Market Analytics<br>
+                🧠 AI-Powered Options Insights
+            </div>
+
+            <a href="{login_url}" target="_self">
+
+                <button class="login-btn">
+                    🔐 Login with Zerodha
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+    """
+
+    st.markdown(login_html, unsafe_allow_html=True)
 
     st.stop()
 
@@ -189,10 +305,7 @@ auto_refresh = st.sidebar.checkbox(
 # ================= LOGOUT =================
 if st.sidebar.button("Logout"):
 
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-
-    st.query_params.clear()
+    st.session_state.clear()
 
     st.success("✅ Logged out successfully")
 
@@ -217,7 +330,6 @@ result = get_cached_data()
 if result is None:
 
     st.error("❌ Unable to fetch Kite data")
-
     st.stop()
 
 df, atm_strike, spot = result
@@ -267,7 +379,7 @@ except Exception:
     sentiment = "Neutral"
     insight = ai_msg
 
-# ================= DISPLAY METRICS =================
+# ================= METRICS =================
 col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("PCR", round(pcr, 2))
@@ -303,7 +415,6 @@ st.subheader("📉 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
-# CALL OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -314,7 +425,6 @@ fig.add_trace(
     )
 )
 
-# PUT OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -325,35 +435,6 @@ fig.add_trace(
     )
 )
 
-# TOTAL CALL LINE
-fig.add_trace(
-    go.Scatter(
-        x=df["Strike"],
-        y=[total_call] * len(df),
-        name="Total Call OI",
-        mode="lines",
-        line=dict(
-            color="red",
-            width=3
-        )
-    )
-)
-
-# TOTAL PUT LINE
-fig.add_trace(
-    go.Scatter(
-        x=df["Strike"],
-        y=[total_put] * len(df),
-        name="Total Put OI",
-        mode="lines",
-        line=dict(
-            color="green",
-            width=3
-        )
-    )
-)
-
-# ATM LINE
 fig.add_vline(
     x=atm_strike,
     line_dash="dash",
@@ -361,17 +442,17 @@ fig.add_vline(
     annotation_text="ATM"
 )
 
-# LAYOUT
 fig.update_layout(
     template="plotly_dark",
     barmode="group",
-    height=550,
+    height=560,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
     xaxis_title="Strike Price",
     yaxis_title="Open Interest",
     legend_title="OI Type"
 )
 
-# SHOW CHART
 st.plotly_chart(
     fig,
     use_container_width=True
