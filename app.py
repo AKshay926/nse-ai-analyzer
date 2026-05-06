@@ -72,7 +72,7 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 
 .top-right-brand {
     position: fixed;
-    top: 70px;
+    top: 95px;
     right: 40px;
     text-align: right;
     z-index: 999;
