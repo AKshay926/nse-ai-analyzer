@@ -10,19 +10,21 @@ from ai_engine import generate_ai_signal
 # ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="PulseIQ",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# ================= CUSTOM STYLING =================
+# ================= CUSTOM CSS =================
 st.markdown("""
 <style>
 
-/* MAIN BACKGROUND */
+/* ================= MAIN BACKGROUND ================= */
+
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.65)
+        rgba(0, 0, 0, 0.45),
+        rgba(0, 0, 0, 0.70)
     ),
     url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
 
@@ -31,19 +33,82 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* REMOVE HEADER */
+/* ================= REMOVE HEADER ================= */
+
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
 
-/* SIDEBAR */
-[data-testid="stSidebar"] {
-    background-color: rgba(10,10,10,0.88);
+/* ================= REMOVE TOP SPACE ================= */
+
+.block-container {
+    padding-top: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
-/* TEXT */
-h1, h2, h3, h4, h5, h6, p, div, label {
+/* ================= SIDEBAR ================= */
+
+[data-testid="stSidebar"] {
+    background-color: rgba(10,10,10,0.90);
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ================= TEXT ================= */
+
+h1, h2, h3, h4, h5, h6,
+p, div, label, span {
     color: white !important;
+}
+
+/* ================= METRIC CARDS ================= */
+
+[data-testid="metric-container"] {
+    background: rgba(20,20,20,0.72);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 18px;
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+}
+
+/* ================= DATAFRAME ================= */
+
+[data-testid="stDataFrame"] {
+    background: rgba(20,20,20,0.72);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* ================= INFO BOX ================= */
+
+[data-testid="stAlert"] {
+    background: rgba(20,20,20,0.80);
+    border-radius: 14px;
+}
+
+/* ================= BUTTON ================= */
+
+.stButton > button {
+    background: linear-gradient(90deg,#2563eb,#1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.stButton > button:hover {
+    opacity: 0.92;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 10px;
 }
 
 </style>
@@ -72,6 +137,7 @@ params = dict(st.query_params)
 if "request_token" in params and not st.session_state["logged_in"]:
 
     try:
+
         request_token = params["request_token"]
 
         if isinstance(request_token, list):
@@ -119,7 +185,6 @@ if st.session_state["access_token"]:
             st.session_state["access_token"]
         )
 
-        # Validate only once
         if not st.session_state["validated"]:
 
             kite.profile()
@@ -140,42 +205,115 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    st.markdown("""
-    # ***⚡ PulseIQ***
-
-    ### *Real-Time Option Chain Intelligence for Smarter Trading*
-
-    📈 Live Market Analytics  
-    🧠 AI-Powered Options Insights
-
-    🔐 Secure Zerodha Login *(Once Daily)*                      
-    """)
-
     st.markdown(
         f"""
-        <a href="{login_url}" target="_self">
-            <button style="
-                background-color:#0f62fe;
-                color:white;
-                padding:14px 28px;
-                border:none;
-                border-radius:12px;
-                font-size:18px;
-                width:100%;
-                cursor:pointer;
-                font-weight:600;
-                margin-top:20px;
-            ">
-                🔐 Login with Zerodha
-            </button>
-        </a>
+        <style>
+
+        .hero-container {{
+            position: relative;
+            height: 82vh;
+        }}
+
+        /* ================= TOP RIGHT BRAND ================= */
+
+        .top-right-brand {{
+            position: absolute;
+            top: 10px;
+            right: 30px;
+            text-align: right;
+        }}
+
+        .brand-title {{
+            color: white;
+            font-size: 58px;
+            font-style: italic;
+            font-weight: 800;
+            margin-bottom: 0px;
+            text-shadow: 0 0 20px rgba(0,0,0,0.7);
+        }}
+
+        .brand-subtitle {{
+            color: rgba(255,255,255,0.82);
+            font-size: 14px;
+            margin-top: -6px;
+            letter-spacing: 0.5px;
+        }}
+
+        /* ================= BOTTOM LEFT ================= */
+
+        .bottom-left {{
+            position: absolute;
+            bottom: 110px;
+            left: 20px;
+        }}
+
+        .feature-points {{
+            color: white;
+            font-size: 20px;
+            line-height: 2;
+            margin-bottom: 22px;
+            text-shadow: 0 0 18px rgba(0,0,0,0.85);
+        }}
+
+        .login-btn {{
+            background: linear-gradient(90deg,#2563eb,#1d4ed8);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(37,99,235,0.35);
+        }}
+
+        .login-btn:hover {{
+            opacity: 0.92;
+        }}
+
+        </style>
+
+        <div class="hero-container">
+
+            <!-- TOP RIGHT -->
+            <div class="top-right-brand">
+
+                <div class="brand-title">
+                    ⚡ PulseIQ
+                </div>
+
+                <div class="brand-subtitle">
+                    AI-Powered Option Chain Intelligence
+                </div>
+
+            </div>
+
+            <!-- BOTTOM LEFT -->
+            <div class="bottom-left">
+
+                <div class="feature-points">
+                    📈 Live Market Analytics<br>
+                    🧠 AI-Powered Options Insights
+                </div>
+
+                <a href="{login_url}" target="_self">
+
+                    <button class="login-btn">
+                        🔐 Login with Zerodha
+                    </button>
+
+                </a>
+
+            </div>
+
+        </div>
         """,
         unsafe_allow_html=True
     )
 
     st.stop()
 
-# ================= MAIN APP =================
+# ================= MAIN DASHBOARD =================
 st.title("📊 PulseIQ Dashboard")
 
 # ================= SIDEBAR =================
@@ -217,7 +355,6 @@ result = get_cached_data()
 if result is None:
 
     st.error("❌ Unable to fetch Kite data")
-
     st.stop()
 
 df, atm_strike, spot = result
@@ -325,34 +462,6 @@ fig.add_trace(
     )
 )
 
-# TOTAL CALL LINE
-fig.add_trace(
-    go.Scatter(
-        x=df["Strike"],
-        y=[total_call] * len(df),
-        name="Total Call OI",
-        mode="lines",
-        line=dict(
-            color="red",
-            width=3
-        )
-    )
-)
-
-# TOTAL PUT LINE
-fig.add_trace(
-    go.Scatter(
-        x=df["Strike"],
-        y=[total_put] * len(df),
-        name="Total Put OI",
-        mode="lines",
-        line=dict(
-            color="green",
-            width=3
-        )
-    )
-)
-
 # ATM LINE
 fig.add_vline(
     x=atm_strike,
@@ -361,11 +470,13 @@ fig.add_vline(
     annotation_text="ATM"
 )
 
-# LAYOUT
+# CHART LAYOUT
 fig.update_layout(
     template="plotly_dark",
     barmode="group",
-    height=550,
+    height=560,
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
     xaxis_title="Strike Price",
     yaxis_title="Open Interest",
     legend_title="OI Type"
