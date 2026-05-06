@@ -9,9 +9,78 @@ from ai_engine import generate_ai_signal
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
-    page_title="Kite AI Analyzer",
+    page_title="PulseIQ",
     layout="wide"
 )
+
+# ================= CUSTOM STYLING =================
+st.markdown("""
+<style>
+
+/* MAIN BACKGROUND */
+.stApp {
+    background-image:
+    linear-gradient(
+        rgba(0, 0, 0, 0.85),
+        rgba(0, 0, 0, 0.90)
+    ),
+    url("https://images.unsplash.com/photo-1642790106117-e829e14a795f");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* REMOVE HEADER BACKGROUND */
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
+
+/* SIDEBAR */
+[data-testid="stSidebar"] {
+    background-color: rgba(10,10,10,0.92);
+}
+
+/* TEXT COLORS */
+h1, h2, h3, h4, h5, h6, p, div, label {
+    color: white !important;
+}
+
+/* METRIC CARDS */
+[data-testid="metric-container"] {
+    background-color: rgba(20,20,20,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 15px;
+    border-radius: 14px;
+}
+
+/* DATAFRAME */
+[data-testid="stDataFrame"] {
+    background-color: rgba(20,20,20,0.75);
+}
+
+/* BUTTONS */
+.stButton>button {
+    background-color: #0f62fe;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+
+.stButton>button:hover {
+    background-color: #1f70ff;
+}
+
+/* INFO BOX */
+[data-testid="stAlert"] {
+    background-color: rgba(20,20,20,0.85);
+    border-radius: 12px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ================= CONFIG =================
 API_KEY = st.secrets["API_KEY"]
@@ -38,7 +107,6 @@ if "request_token" in params and not st.session_state["logged_in"]:
     try:
         request_token = params["request_token"]
 
-        # Fix Streamlit list issue
         if isinstance(request_token, list):
             request_token = request_token[0]
 
@@ -47,15 +115,14 @@ if "request_token" in params and not st.session_state["logged_in"]:
             api_secret=API_SECRET
         )
 
-        # Save session
         st.session_state["access_token"] = data["access_token"]
         st.session_state["logged_in"] = True
         st.session_state["validated"] = False
 
-        # Set token
-        kite.set_access_token(data["access_token"])
+        kite.set_access_token(
+            data["access_token"]
+        )
 
-        # Clear URL params
         st.query_params.clear()
 
         st.success("✅ Login Successful")
@@ -106,30 +173,31 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    
-
     st.markdown("""
-    
-   # ***⚡ PulseIQ***
+    # ***⚡ PulseIQ***
 
-   ### ***Real-Time Option Chain Intelligence for Smarter Trading***
+    ### *Real-Time Option Chain Intelligence for Smarter Trading*
 
-   🔐 Secure Zerodha Login *(Once Daily)*
+    🔐 Secure Zerodha Login *(Once Daily)*
+
+    📈 Live Market Analytics  
+    🧠 AI-Powered Options Insights
     """)
 
-    # SAME TAB LOGIN
     st.markdown(
         f"""
         <a href="{login_url}" target="_self">
             <button style="
-                background-color:#3872E0;
+                background-color:#0f62fe;
                 color:white;
-                padding:12px 24px;
+                padding:14px 28px;
                 border:none;
-                border-radius:8px;
-                font-size:16px;
+                border-radius:12px;
+                font-size:18px;
                 width:100%;
                 cursor:pointer;
+                font-weight:600;
+                margin-top:20px;
             ">
                 🔐 Login with Zerodha
             </button>
@@ -141,10 +209,10 @@ if not st.session_state["logged_in"]:
     st.stop()
 
 # ================= MAIN APP =================
-st.title("📊 Kite AI Options Analyzer")
+st.title("📊 PulseIQ Dashboard")
 
 # ================= SIDEBAR =================
-st.sidebar.header("Settings")
+st.sidebar.header("⚙ Settings")
 
 auto_refresh = st.sidebar.checkbox(
     "Auto Refresh (1 Minute)",
@@ -235,25 +303,10 @@ except Exception:
 # ================= DISPLAY METRICS =================
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric(
-    "PCR",
-    round(pcr, 2)
-)
-
-col2.metric(
-    "Support",
-    int(support)
-)
-
-col3.metric(
-    "Resistance",
-    int(resistance)
-)
-
-col4.metric(
-    "Trend",
-    sentiment
-)
+col1.metric("PCR", round(pcr, 2))
+col2.metric("Support", int(support))
+col3.metric("Resistance", int(resistance))
+col4.metric("Trend", sentiment)
 
 # ================= AI INSIGHT =================
 st.subheader("🧠 AI Insight")
@@ -283,7 +336,7 @@ st.subheader("📉 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
-# ================= CALL OI =================
+# CALL OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -294,7 +347,7 @@ fig.add_trace(
     )
 )
 
-# ================= PUT OI =================
+# PUT OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -305,7 +358,7 @@ fig.add_trace(
     )
 )
 
-# ================= TOTAL CALL LINE =================
+# TOTAL CALL LINE
 fig.add_trace(
     go.Scatter(
         x=df["Strike"],
@@ -319,7 +372,7 @@ fig.add_trace(
     )
 )
 
-# ================= TOTAL PUT LINE =================
+# TOTAL PUT LINE
 fig.add_trace(
     go.Scatter(
         x=df["Strike"],
@@ -333,7 +386,7 @@ fig.add_trace(
     )
 )
 
-# ================= ATM LINE =================
+# ATM LINE
 fig.add_vline(
     x=atm_strike,
     line_dash="dash",
@@ -341,7 +394,7 @@ fig.add_vline(
     annotation_text="ATM"
 )
 
-# ================= LAYOUT =================
+# LAYOUT
 fig.update_layout(
     template="plotly_dark",
     barmode="group",
@@ -351,7 +404,7 @@ fig.update_layout(
     legend_title="OI Type"
 )
 
-# ================= SHOW CHART =================
+# SHOW CHART
 st.plotly_chart(
     fig,
     use_container_width=True
