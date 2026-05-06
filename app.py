@@ -10,114 +10,73 @@ from ai_engine import generate_ai_signal
 # ================= PAGE CONFIG =================
 st.set_page_config(
     page_title="PulseIQ",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# ================= CUSTOM CSS =================
+# ================= CUSTOM STYLING =================
 st.markdown("""
 <style>
 
-/* ================= GLOBAL ================= */
-
-html, body, [class*="css"] {
-    font-family: 'Segoe UI', sans-serif;
-}
-
-/* ================= MAIN CONTAINER ================= */
-
-.block-container {
-    padding-top: 2rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-}
-
-/* ================= BACKGROUND ================= */
-
+/* MAIN BACKGROUND */
 .stApp {
     background-image:
     linear-gradient(
-        rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.72)
+        rgba(0, 0, 0, 0.85),
+        rgba(0, 0, 0, 0.90)
     ),
-    url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
+    url("https://images.unsplash.com/photo-1642790106117-e829e14a795f");
 
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* ================= REMOVE HEADER ================= */
-
+/* REMOVE HEADER BACKGROUND */
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
 
-/* ================= SIDEBAR ================= */
-
+/* SIDEBAR */
 [data-testid="stSidebar"] {
-    background: rgba(12,12,18,0.92);
-    border-right: 1px solid rgba(255,255,255,0.08);
+    background-color: rgba(10,10,10,0.92);
 }
 
-/* ================= TEXT ================= */
-
-h1, h2, h3, h4, h5, h6,
-p, div, label, span {
+/* TEXT COLORS */
+h1, h2, h3, h4, h5, h6, p, div, label {
     color: white !important;
 }
 
-/* ================= METRIC CARDS ================= */
-
+/* METRIC CARDS */
 [data-testid="metric-container"] {
-    background: rgba(15,15,25,0.78);
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 18px;
-    border-radius: 16px;
-    backdrop-filter: blur(8px);
-}
-
-/* ================= DATAFRAME ================= */
-
-[data-testid="stDataFrame"] {
-    background: rgba(15,15,25,0.78);
-    border-radius: 16px;
-    overflow: hidden;
-}
-
-/* ================= ALERT ================= */
-
-[data-testid="stAlert"] {
-    background: rgba(15,15,25,0.88);
+    background-color: rgba(20,20,20,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 15px;
     border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.05);
 }
 
-/* ================= BUTTONS ================= */
+/* DATAFRAME */
+[data-testid="stDataFrame"] {
+    background-color: rgba(20,20,20,0.75);
+}
 
-.stButton > button {
-    background: linear-gradient(90deg,#2563eb,#1d4ed8);
+/* BUTTONS */
+.stButton>button {
+    background-color: #0f62fe;
     color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 0.6rem 1.2rem;
-    font-weight: 700;
-}
-
-.stButton > button:hover {
-    background: linear-gradient(90deg,#1d4ed8,#1e40af);
-    color: white;
-}
-
-/* ================= SCROLLBAR ================= */
-
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1f2937;
     border-radius: 10px;
+    border: none;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+
+.stButton>button:hover {
+    background-color: #1f70ff;
+}
+
+/* INFO BOX */
+[data-testid="stAlert"] {
+    background-color: rgba(20,20,20,0.85);
+    border-radius: 12px;
 }
 
 </style>
@@ -129,7 +88,7 @@ API_SECRET = st.secrets["API_SECRET"]
 
 kite = KiteConnect(api_key=API_KEY)
 
-# ================= SESSION =================
+# ================= SESSION INIT =================
 if "access_token" not in st.session_state:
     st.session_state["access_token"] = None
 
@@ -146,7 +105,6 @@ params = dict(st.query_params)
 if "request_token" in params and not st.session_state["logged_in"]:
 
     try:
-
         request_token = params["request_token"]
 
         if isinstance(request_token, list):
@@ -161,7 +119,9 @@ if "request_token" in params and not st.session_state["logged_in"]:
         st.session_state["logged_in"] = True
         st.session_state["validated"] = False
 
-        kite.set_access_token(data["access_token"])
+        kite.set_access_token(
+            data["access_token"]
+        )
 
         st.query_params.clear()
 
@@ -171,7 +131,7 @@ if "request_token" in params and not st.session_state["logged_in"]:
 
     except Exception as e:
 
-        st.error(f"❌ Login Failed: {e}")
+        st.error(f"❌ Login failed: {e}")
 
         st.session_state["access_token"] = None
         st.session_state["logged_in"] = False
@@ -192,6 +152,7 @@ if st.session_state["access_token"]:
             st.session_state["access_token"]
         )
 
+        # Validate only once
         if not st.session_state["validated"]:
 
             kite.profile()
@@ -207,111 +168,47 @@ if st.session_state["access_token"]:
         st.session_state["logged_in"] = False
         st.session_state["validated"] = False
 
-# ================= LOGIN PAGE =================
+# ================= LOGIN SCREEN =================
 if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    hero_html = f"""
-    <div style="
-        margin-top:40px;
-        margin-left:20px;
-        max-width:720px;
-        background:rgba(12,12,22,0.72);
-        padding:50px;
-        border-radius:24px;
-        backdrop-filter: blur(10px);
-        border:1px solid rgba(255,255,255,0.08);
-        box-shadow:0 0 30px rgba(0,0,0,0.35);
-    ">
+    st.markdown("""
+    # ***⚡ PulseIQ***
 
-        <div style="
-            font-size:16px;
-            color:#93c5fd;
-            letter-spacing:2px;
-            margin-bottom:15px;
-        ">
-            AI MARKET INTELLIGENCE
-        </div>
+    ### *Real-Time Option Chain Intelligence for Smarter Trading*
 
-        <h1 style="
-            color:white;
-            font-size:72px;
-            margin-bottom:5px;
-            font-style:italic;
-            font-weight:800;
-            line-height:1;
-        ">
-            ⚡ PulseIQ
-        </h1>
+    🔐 Secure Zerodha Login *(Once Daily)*
 
-        <div style="
-            width:120px;
-            height:4px;
-            background:#2563eb;
-            border-radius:10px;
-            margin-top:18px;
-            margin-bottom:24px;
-        "></div>
+    📈 Live Market Analytics  
+    🧠 AI-Powered Options Insights
+    """)
 
-        <p style="
-            color:white;
-            font-size:21px;
-            margin-top:10px;
-            opacity:0.92;
-            line-height:1.6;
-            max-width:580px;
-        ">
-            Real-Time Option Chain Intelligence for Smarter Trading Decisions
-        </p>
-
-        <div style="
-            margin-top:35px;
-            font-size:18px;
-            line-height:2.2;
-            color:white;
-        ">
-            📈 Live Market Analytics<br>
-            🧠 AI-Powered Options Insights<br>
-            ⚡ Real-Time Open Interest Tracking
-        </div>
-
-        <div style="
-            margin-top:20px;
-            font-size:15px;
-            color:#d1d5db;
-            opacity:0.9;
-        ">
-            🔐 Secure Zerodha Authentication • Once Daily Login
-        </div>
-
+    st.markdown(
+        f"""
         <a href="{login_url}" target="_self">
-
             <button style="
-                margin-top:38px;
-                background:linear-gradient(90deg,#2563eb,#1d4ed8);
+                background-color:#0f62fe;
                 color:white;
-                padding:15px 34px;
+                padding:14px 28px;
                 border:none;
-                border-radius:16px;
+                border-radius:12px;
                 font-size:18px;
+                width:100%;
                 cursor:pointer;
-                font-weight:700;
-                box-shadow:0 0 25px rgba(37,99,235,0.4);
+                font-weight:600;
+                margin-top:20px;
             ">
                 🔐 Login with Zerodha
             </button>
-
         </a>
-
-    </div>
-    """
-
-    st.markdown(hero_html, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True
+    )
 
     st.stop()
 
-# ================= DASHBOARD =================
+# ================= MAIN APP =================
 st.title("📊 PulseIQ Dashboard")
 
 # ================= SIDEBAR =================
@@ -342,7 +239,7 @@ if auto_refresh:
         key="live_refresh"
     )
 
-# ================= CACHE =================
+# ================= CACHE DATA =================
 @st.cache_data(ttl=30)
 def get_cached_data():
     return fetch_option_chain("NIFTY")
@@ -353,11 +250,12 @@ result = get_cached_data()
 if result is None:
 
     st.error("❌ Unable to fetch Kite data")
+
     st.stop()
 
 df, atm_strike, spot = result
 
-# ================= LIVE DATA =================
+# ================= LIVE METRICS =================
 st.subheader("📈 NIFTY Live Data")
 
 colA, colB = st.columns(2)
@@ -402,7 +300,7 @@ except Exception:
     sentiment = "Neutral"
     insight = ai_msg
 
-# ================= METRICS =================
+# ================= DISPLAY METRICS =================
 col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("PCR", round(pcr, 2))
@@ -433,11 +331,12 @@ colY.metric(
     f"{int(total_put):,}"
 )
 
-# ================= CHART =================
+# ================= OI CHART =================
 st.subheader("📉 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
+# CALL OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -448,6 +347,7 @@ fig.add_trace(
     )
 )
 
+# PUT OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -458,6 +358,35 @@ fig.add_trace(
     )
 )
 
+# TOTAL CALL LINE
+fig.add_trace(
+    go.Scatter(
+        x=df["Strike"],
+        y=[total_call] * len(df),
+        name="Total Call OI",
+        mode="lines",
+        line=dict(
+            color="red",
+            width=3
+        )
+    )
+)
+
+# TOTAL PUT LINE
+fig.add_trace(
+    go.Scatter(
+        x=df["Strike"],
+        y=[total_put] * len(df),
+        name="Total Put OI",
+        mode="lines",
+        line=dict(
+            color="green",
+            width=3
+        )
+    )
+)
+
+# ATM LINE
 fig.add_vline(
     x=atm_strike,
     line_dash="dash",
@@ -465,23 +394,23 @@ fig.add_vline(
     annotation_text="ATM"
 )
 
+# LAYOUT
 fig.update_layout(
     template="plotly_dark",
     barmode="group",
-    height=560,
-    paper_bgcolor="rgba(0,0,0,0)",
-    plot_bgcolor="rgba(0,0,0,0)",
+    height=550,
     xaxis_title="Strike Price",
     yaxis_title="Open Interest",
     legend_title="OI Type"
 )
 
+# SHOW CHART
 st.plotly_chart(
     fig,
     use_container_width=True
 )
 
-# ================= OPTION CHAIN =================
+# ================= OPTION CHAIN TABLE =================
 st.subheader("📋 ATM ±4 Option Chain")
 
 st.dataframe(
