@@ -112,7 +112,7 @@ if not st.session_state["logged_in"]:
     
    # ***⚡ PulseIQ***
 
-   ### Real-Time Option Chain Intelligence for Smarter Trading
+   ### ***Real-Time Option Chain Intelligence for Smarter Trading***
 
    🔐 Secure Zerodha Login *(Once Daily)*
     """)
