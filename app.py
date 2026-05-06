@@ -237,7 +237,6 @@ if st.session_state.get("access_token"):
 
         st.session_state["logged_in"] = False
         st.session_state["access_token"] = None
-
 # ================= LOGIN SCREEN =================
 if not st.session_state["logged_in"]:
 
@@ -246,32 +245,18 @@ if not st.session_state["logged_in"]:
     st.markdown(
         f"""
         <div class="top-right-brand">
-
-            <div class="brand-title">
-                ⚡ PulseIQ
-            </div>
-
-            <div class="brand-subtitle">
-                AI-Powered Option Chain Intelligence
-            </div>
-
+            <div class="brand-title">&#9889; PulseIQ</div>
+            <div class="brand-subtitle">AI-Powered Option Chain Intelligence</div>
         </div>
 
         <div class="bottom-left">
-
             <div class="feature-points">
-                📈 Live Market Analytics<br>
-                🧠 AI-Powered Options Insights
+                &#128200; Live Market Analytics<br/>
+                &#129504; AI-Powered Options Insights
             </div>
-
             <a href="{login_url}" target="_self">
-
-                <button class="login-btn">
-                    🔐 Login with Zerodha
-                </button>
-
+                <button class="login-btn">&#128272; Login with Zerodha</button>
             </a>
-
         </div>
         """,
         unsafe_allow_html=True
