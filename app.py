@@ -18,8 +18,6 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* ================= BACKGROUND ================= */
-
 .stApp {
     background-image:
     linear-gradient(
@@ -27,19 +25,14 @@ st.markdown("""
         rgba(0,0,0,0.72)
     ),
     url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
-
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* ================= REMOVE STREAMLIT HEADER ================= */
-
 [data-testid="stHeader"] {
     background: rgba(0,0,0,0);
 }
-
-/* ================= REMOVE TOP SPACE ================= */
 
 .block-container {
     padding-top: 1rem;
@@ -47,20 +40,14 @@ st.markdown("""
     padding-right: 2rem;
 }
 
-/* ================= SIDEBAR ================= */
-
 [data-testid="stSidebar"] {
     background-color: rgba(10,10,10,0.92);
 }
-
-/* ================= TEXT ================= */
 
 h1, h2, h3, h4, h5, h6,
 p, div, label, span {
     color: white !important;
 }
-
-/* ================= METRIC CARDS ================= */
 
 [data-testid="metric-container"] {
     background: rgba(20,20,20,0.72);
@@ -70,22 +57,16 @@ p, div, label, span {
     backdrop-filter: blur(8px);
 }
 
-/* ================= DATAFRAME ================= */
-
 [data-testid="stDataFrame"] {
     background: rgba(20,20,20,0.72);
     border-radius: 14px;
     overflow: hidden;
 }
 
-/* ================= INFO BOX ================= */
-
 [data-testid="stAlert"] {
     background: rgba(20,20,20,0.80);
     border-radius: 14px;
 }
-
-/* ================= BUTTONS ================= */
 
 .stButton > button {
     background: linear-gradient(90deg,#2563eb,#1d4ed8);
@@ -95,8 +76,6 @@ p, div, label, span {
     font-weight: 700;
 }
 
-/* ================= SCROLLBAR ================= */
-
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -105,8 +84,6 @@ p, div, label, span {
     background: #1f2937;
     border-radius: 10px;
 }
-
-/* ================= LOGIN PAGE ================= */
 
 .top-right-brand {
     position: fixed;
@@ -186,7 +163,6 @@ if "request_token" in st.query_params:
     try:
 
         if st.session_state.get("logged_in"):
-
             st.query_params.clear()
             st.rerun()
 
@@ -217,11 +193,10 @@ if "request_token" in st.query_params:
     except Exception as e:
 
         st.error(f"❌ Login failed: {e}")
-
         st.stop()
 
 # ================= VALIDATE SESSION =================
-if st.session_state.get("access_token"):
+if st.session_state.get("access_token") and not st.session_state.get("validated"):
 
     try:
 
@@ -232,11 +207,14 @@ if st.session_state.get("access_token"):
         kite.profile()
 
         st.session_state["logged_in"] = True
+        st.session_state["validated"] = True
 
     except Exception:
 
         st.session_state["logged_in"] = False
         st.session_state["access_token"] = None
+        st.session_state["validated"] = False
+
 # ================= LOGIN SCREEN =================
 if not st.session_state["logged_in"]:
 
@@ -278,10 +256,11 @@ auto_refresh = st.sidebar.checkbox(
 # ================= LOGOUT =================
 if st.sidebar.button("Logout"):
 
-    st.session_state.clear()
+    st.session_state["access_token"] = None
+    st.session_state["logged_in"] = False
+    st.session_state["validated"] = False
 
     st.success("✅ Logged out successfully")
-
     st.rerun()
 
 # ================= AUTO REFRESH =================
