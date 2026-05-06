@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from kiteconnect import KiteConnect
 from streamlit_autorefresh import st_autorefresh
+from supabase import create_client
 
 from kite_fetch import fetch_option_chain
 from analysis import calculate_metrics
@@ -20,19 +21,14 @@ st.markdown("""
 
 .stApp {
     background-image:
-    linear-gradient(
-        rgba(0,0,0,0.45),
-        rgba(0,0,0,0.72)
-    ),
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.72)),
     url("https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-[data-testid="stHeader"] {
-    background: rgba(0,0,0,0);
-}
+[data-testid="stHeader"] { background: rgba(0,0,0,0); }
 
 .block-container {
     padding-top: 1rem;
@@ -40,14 +36,9 @@ st.markdown("""
     padding-right: 2rem;
 }
 
-[data-testid="stSidebar"] {
-    background-color: rgba(10,10,10,0.92);
-}
+[data-testid="stSidebar"] { background-color: rgba(10,10,10,0.92); }
 
-h1, h2, h3, h4, h5, h6,
-p, div, label, span {
-    color: white !important;
-}
+h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 
 [data-testid="metric-container"] {
     background: rgba(20,20,20,0.72);
@@ -76,14 +67,8 @@ p, div, label, span {
     font-weight: 700;
 }
 
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1f2937;
-    border-radius: 10px;
-}
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
 
 .top-right-brand {
     position: fixed;
@@ -134,9 +119,7 @@ p, div, label, span {
     cursor: pointer;
 }
 
-.login-btn:hover {
-    opacity: 0.92;
-}
+.login-btn:hover { opacity: 0.92; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -144,13 +127,32 @@ p, div, label, span {
 # ================= CONFIG =================
 API_KEY = st.secrets["API_KEY"]
 API_SECRET = st.secrets["API_SECRET"]
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
 kite = KiteConnect(api_key=API_KEY)
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# ================= SUPABASE HELPERS =================
+def save_token(token: str):
+    supabase.table("sessions").update({
+        "access_token": token,
+        "updated_at": "now()"
+    }).eq("id", "main").execute()
+
+def load_token() -> str | None:
+    res = supabase.table("sessions").select("access_token").eq("id", "main").execute()
+    if res.data and res.data[0]["access_token"]:
+        return res.data[0]["access_token"]
+    return None
+
+def clear_token():
+    supabase.table("sessions").update({
+        "access_token": None,
+        "updated_at": "now()"
+    }).eq("id", "main").execute()
 
 # ================= SESSION =================
-if "access_token" not in st.session_state:
-    st.session_state["access_token"] = None
-
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
@@ -158,13 +160,9 @@ if "validated" not in st.session_state:
     st.session_state["validated"] = False
 
 # ================= LOGIN HANDLER =================
-if "request_token" in st.query_params:
+if "request_token" in st.query_params and not st.session_state.get("logged_in"):
 
     try:
-
-        if st.session_state.get("logged_in"):
-            st.query_params.clear()
-            st.rerun()
 
         request_token = st.query_params["request_token"]
 
@@ -180,39 +178,43 @@ if "request_token" in st.query_params:
 
         kite.set_access_token(access_token)
 
-        st.session_state["access_token"] = access_token
+        # Save to Supabase
+        save_token(access_token)
+
         st.session_state["logged_in"] = True
         st.session_state["validated"] = True
 
-        st.query_params.clear()
-
-        st.success("✅ Login Successful")
-
-        st.rerun()
+        # Let script fall through — no rerun/redirect
 
     except Exception as e:
 
         st.error(f"❌ Login failed: {e}")
         st.stop()
 
-# ================= VALIDATE SESSION =================
-if st.session_state.get("access_token") and not st.session_state.get("validated"):
+# ================= VALIDATE SESSION FROM DB =================
+if not st.session_state.get("validated"):
 
     try:
 
-        kite.set_access_token(
-            st.session_state["access_token"]
-        )
+        token = load_token()
 
-        kite.profile()
+        if token:
 
-        st.session_state["logged_in"] = True
-        st.session_state["validated"] = True
+            kite.set_access_token(token)
+            kite.profile()  # Verify token is still valid
+
+            st.session_state["logged_in"] = True
+            st.session_state["validated"] = True
+
+        else:
+
+            st.session_state["logged_in"] = False
 
     except Exception:
 
+        # Token expired or invalid — clear it from DB
+        clear_token()
         st.session_state["logged_in"] = False
-        st.session_state["access_token"] = None
         st.session_state["validated"] = False
 
 # ================= LOGIN SCREEN =================
@@ -256,7 +258,8 @@ auto_refresh = st.sidebar.checkbox(
 # ================= LOGOUT =================
 if st.sidebar.button("Logout"):
 
-    st.session_state["access_token"] = None
+    clear_token()
+
     st.session_state["logged_in"] = False
     st.session_state["validated"] = False
 
@@ -291,43 +294,20 @@ st.subheader("📈 NIFTY Live Data")
 
 colA, colB = st.columns(2)
 
-colA.metric(
-    "NIFTY Spot",
-    round(spot, 2)
-)
-
-colB.metric(
-    "ATM Strike",
-    int(atm_strike)
-)
+colA.metric("NIFTY Spot", round(spot, 2))
+colB.metric("ATM Strike", int(atm_strike))
 
 # ================= ANALYSIS =================
 pcr, support, resistance = calculate_metrics(df)
 
-ai_msg = generate_ai_signal(
-    pcr,
-    support,
-    resistance
-)
+ai_msg = generate_ai_signal(pcr, support, resistance)
 
-lines = [
-    line.strip()
-    for line in ai_msg.split("\n")
-    if line.strip()
-]
+lines = [line.strip() for line in ai_msg.split("\n") if line.strip()]
 
 try:
-
-    sentiment = (
-        lines[0]
-        .replace("📊 Market Sentiment:", "")
-        .strip()
-    )
-
+    sentiment = lines[0].replace("📊 Market Sentiment:", "").strip()
     insight = lines[-1]
-
 except Exception:
-
     sentiment = "Neutral"
     insight = ai_msg
 
@@ -341,7 +321,6 @@ col4.metric("Trend", sentiment)
 
 # ================= AI INSIGHT =================
 st.subheader("🧠 AI Insight")
-
 st.info(insight)
 
 # ================= TOTAL OI =================
@@ -352,40 +331,23 @@ st.subheader("📊 Open Interest Strength")
 
 colX, colY = st.columns(2)
 
-colX.metric(
-    "🔴 Total Call OI",
-    f"{int(total_call):,}"
-)
-
-colY.metric(
-    "🟢 Total Put OI",
-    f"{int(total_put):,}"
-)
+colX.metric("🔴 Total Call OI", f"{int(total_call):,}")
+colY.metric("🟢 Total Put OI", f"{int(total_put):,}")
 
 # ================= OI CHART =================
 st.subheader("📉 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
-fig.add_trace(
-    go.Bar(
-        x=df["Strike"],
-        y=df["Call OI"],
-        name="Call OI",
-        marker_color="red",
-        opacity=0.65
-    )
-)
+fig.add_trace(go.Bar(
+    x=df["Strike"], y=df["Call OI"],
+    name="Call OI", marker_color="red", opacity=0.65
+))
 
-fig.add_trace(
-    go.Bar(
-        x=df["Strike"],
-        y=df["Put OI"],
-        name="Put OI",
-        marker_color="green",
-        opacity=0.65
-    )
-)
+fig.add_trace(go.Bar(
+    x=df["Strike"], y=df["Put OI"],
+    name="Put OI", marker_color="green", opacity=0.65
+))
 
 fig.add_vline(
     x=atm_strike,
@@ -405,10 +367,7 @@ fig.update_layout(
     legend_title="OI Type"
 )
 
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
+st.plotly_chart(fig, use_container_width=True)
 
 # ================= OPTION CHAIN TABLE =================
 st.subheader("📋 ATM ±4 Option Chain")

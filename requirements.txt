@@ -3,3 +3,4 @@ pandas
 plotly
 kiteconnect
 streamlit-autorefresh
+supabase
