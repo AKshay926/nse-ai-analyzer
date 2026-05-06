@@ -17,7 +17,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* ================= MAIN BACKGROUND ================= */
+/* ================= BACKGROUND ================= */
 
 .stApp {
     background-image:
@@ -53,7 +53,7 @@ h1, h2, h3, h4, h5, h6, p, div, label {
 /* ================= METRIC CARDS ================= */
 
 [data-testid="metric-container"] {
-    background-color: rgba(20,20,20,0.75);
+    background-color: rgba(20,20,20,0.72);
     border: 1px solid rgba(255,255,255,0.08);
     padding: 15px;
     border-radius: 14px;
@@ -128,9 +128,7 @@ if "request_token" in params and not st.session_state["logged_in"]:
         st.session_state["logged_in"] = True
         st.session_state["validated"] = False
 
-        kite.set_access_token(
-            data["access_token"]
-        )
+        kite.set_access_token(data["access_token"])
 
         st.query_params.clear()
 
@@ -161,7 +159,6 @@ if st.session_state["access_token"]:
             st.session_state["access_token"]
         )
 
-        # Validate only once
         if not st.session_state["validated"]:
 
             kite.profile()
@@ -182,53 +179,56 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    st.markdown("""
-    <div style="
-        margin-top: -10px;
-        margin-left: 30px;
-    ">
-
-        <h1 style="
-            color:white;
-            font-size:62px;
-            margin-bottom:0px;
-            font-style:italic;
-            font-weight:800;
-        ">
-            ⚡ PulseIQ
-        </h1>
-
-        <p style="
-            color:white;
-            font-size:20px;
-            margin-top:5px;
-            font-style:italic;
-            opacity:0.92;
-        ">
-            Real-Time Option Chain Intelligence for Smarter Trading
-        </p>
-
+    st.markdown(
+        """
         <div style="
-            margin-top:35px;
-            font-size:18px;
-            line-height:2;
-            color:white;
+            margin-top:-10px;
+            margin-left:30px;
         ">
-            📈 Live Market Analytics<br>
-            🧠 AI-Powered Options Insights
-        </div>
 
-        <div style="
-            margin-top:25px;
-            font-size:16px;
-            color:white;
-            opacity:0.9;
-        ">
-            🔐 Secure Zerodha Login <i>(Once Daily)</i>
-        </div>
+            <h1 style="
+                color:white;
+                font-size:62px;
+                margin-bottom:0px;
+                font-style:italic;
+                font-weight:800;
+            ">
+                ⚡ PulseIQ
+            </h1>
 
-    </div>
-    """, unsafe_allow_html=True)
+            <p style="
+                color:white;
+                font-size:20px;
+                margin-top:5px;
+                font-style:italic;
+                opacity:0.92;
+            ">
+                Real-Time Option Chain Intelligence for Smarter Trading
+            </p>
+
+            <div style="
+                margin-top:35px;
+                font-size:18px;
+                line-height:2;
+                color:white;
+            ">
+                📈 Live Market Analytics<br>
+                🧠 AI-Powered Options Insights
+            </div>
+
+            <div style="
+                margin-top:25px;
+                font-size:16px;
+                color:white;
+                opacity:0.9;
+            ">
+                🔐 Secure Zerodha Login <i>(Once Daily)</i>
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # ================= LOGIN BUTTON =================
 
@@ -388,7 +388,6 @@ st.subheader("📉 OI Comparison (ATM ±4)")
 
 fig = go.Figure()
 
-# CALL OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -399,7 +398,6 @@ fig.add_trace(
     )
 )
 
-# PUT OI
 fig.add_trace(
     go.Bar(
         x=df["Strike"],
@@ -410,7 +408,6 @@ fig.add_trace(
     )
 )
 
-# TOTAL CALL LINE
 fig.add_trace(
     go.Scatter(
         x=df["Strike"],
@@ -424,7 +421,6 @@ fig.add_trace(
     )
 )
 
-# TOTAL PUT LINE
 fig.add_trace(
     go.Scatter(
         x=df["Strike"],
@@ -438,7 +434,6 @@ fig.add_trace(
     )
 )
 
-# ATM LINE
 fig.add_vline(
     x=atm_strike,
     line_dash="dash",
@@ -446,7 +441,6 @@ fig.add_vline(
     annotation_text="ATM"
 )
 
-# LAYOUT
 fig.update_layout(
     template="plotly_dark",
     barmode="group",
@@ -456,7 +450,6 @@ fig.update_layout(
     legend_title="OI Type"
 )
 
-# SHOW CHART
 st.plotly_chart(
     fig,
     use_container_width=True
