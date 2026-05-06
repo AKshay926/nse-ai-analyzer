@@ -106,16 +106,15 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    st.title("🔐 Zerodha Login Required")
+    
 
     st.markdown("""
     
-# ⚡ PulseIQ
+   # ***⚡ PulseIQ***
 
-### *Intelligence Behind Every Move*
+   ### *Intelligence Behind Every Move*
 
-📈 Live Options Analytics  
-🧠 AI-Powered Market Signals
+   🔐 Secure Zerodha Login *(Once Daily)*
     """)
 
     # SAME TAB LOGIN
