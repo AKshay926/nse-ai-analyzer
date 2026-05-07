@@ -430,32 +430,53 @@ if not st.session_state["logged_in"]:
             left: 40px;
             z-index: 999;
         }}
-        .login-features {{
-         display: flex;
-         flex-direction: column;
-            fgap: 18px;
+        .login-features {
 
-          font-family:
-          "Inter",
-          "Segoe UI",
-          sans-serif;
+    display: flex;
+    flex-direction: column;
 
-          font-size: 24px;
+    gap: 18px;
 
-          font-weight: 700;
+    font-family:
+        "Inter",
+        "Segoe UI",
+        sans-serif;
 
-         letter-spacing: 0.4px;
+    font-size: 24px;
 
-          color: rgba(255,255,255,0.96);
+    font-weight: 700;
 
-           line-height: 1.6;
+    letter-spacing: 0.4px;
 
-           text-shadow:
-           0 0 8px rgba(255,255,255,0.08),
-           0 0 18px rgba(0,180,255,0.12);
+    color: rgba(255,255,255,0.96);
 
-         margin-bottom: 28px;
-        }}
+    line-height: 1.6;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,0.08),
+        0 0 18px rgba(0,180,255,0.12);
+
+    margin-bottom: 28px;
+}
+
+.feature-item {
+
+    position: relative;
+
+    padding-left: 8px;
+
+    transition: all 0.25s ease;
+}
+
+.feature-item:hover {
+
+    transform: translateX(6px);
+
+    color: #38bdf8;
+
+    text-shadow:
+        0 0 12px rgba(56,189,248,0.65);
+}
         .
         .login-btn {{
             background: rgba(37,99,235,0.92);
