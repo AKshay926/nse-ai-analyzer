@@ -160,6 +160,7 @@ if "validated" not in st.session_state:
     st.session_state["validated"] = False
 
 # ================= LOGIN HANDLER =================
+                # ================= LOGIN HANDLER =================
 if "request_token" in st.query_params and not st.session_state.get("logged_in"):
 
     try:
@@ -180,6 +181,10 @@ if "request_token" in st.query_params and not st.session_state.get("logged_in"):
 
         st.session_state["logged_in"]  = True
         st.session_state["validated"]  = True
+
+        # ✅ FIX: Clear request_token from URL to stop redirect loop
+        st.query_params.clear()
+        st.rerun()
 
     except Exception as e:
         st.error(f"❌ Login failed: {e}")
