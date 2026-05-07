@@ -432,38 +432,41 @@ if not st.session_state["logged_in"]:
         }}
          .login-features {{
 
-         display: flex;
+                             display: flex;
 
-         flex-direction: column;
+    flex-direction: column;
 
-          gap: 24px;
+    gap: 24px;
 
-         font-family:
+    font-family:
         "SF Pro Display",
         "Inter",
         "Poppins",
         sans-serif;
 
-        font-size: 22px;
+    font-size: 22px;
 
-         font-weight: 600;
+    font-weight: 600;
 
-       letter-spacing: -0.3px;
+    font-style: italic;
 
-       color: rgba(255,255,255,0.96);
+    letter-spacing: -0.3px;
+
+    color: rgba(255,255,255,0.96);
 
     line-height: 1.4;
 
     margin-bottom: 34px;
-
     
       }}
         .feature-item {{
-                       position: relative;
+                         position: relative;
 
     padding: 12px 18px;
 
     border-radius: 16px;
+
+    transform: skewX(-3deg);
 
     background:
         linear-gradient(
@@ -477,13 +480,8 @@ if not st.session_state["logged_in"]:
 
     backdrop-filter: blur(8px);
 
-    box-shadow:
-        0 0 20px rgba(0,140,255,0.05);
-
     transition:
         all 0.28s ease;
-
-    overflow: hidden;
     
      }}
                .feature-item::before {{
