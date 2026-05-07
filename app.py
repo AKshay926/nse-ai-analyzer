@@ -246,7 +246,9 @@ if not st.session_state["logged_in"]:
 
 # ================= MAIN APP =================
 st.title("📊 PulseIQ Dashboard")
+token = load_token()
 
+st.write("SUPABASE TOKEN:", token)
 # ================= SIDEBAR =================
 st.sidebar.header("⚙ Settings")
 
