@@ -135,10 +135,13 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ================= SUPABASE HELPERS =================
 def save_token(token: str):
-    supabase.table("sessions").update({
-        "access_token": token,
-        "updated_at": "now()"
-    }).eq("id", "main").execute()
+
+    response = supabase.table("sessions").upsert({
+        "id": "main",
+        "access_token": token
+    }).execute()
+
+    print(response)
 
 def load_token() -> str | None:
     res = supabase.table("sessions").select("access_token").eq("id", "main").execute()
@@ -178,6 +181,9 @@ if "request_token" in st.query_params and not st.session_state.get("logged_in"):
         kite.set_access_token(access_token)
 
         save_token(access_token)
+        stored = load_token()
+
+        st.write("Stored Token:", stored)
 
         st.session_state["logged_in"]  = True
         st.session_state["validated"]  = True
