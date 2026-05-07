@@ -13,7 +13,15 @@ def get_kite():
     return kite
 
 
-def fetch_option_chain(symbol="NIFTY"):
+def fetch_option_chain(symbol="NIFTY", range_size=10, custom_strike=None):
+    """
+    Fetch option chain data.
+
+    Args:
+        symbol       : Index name e.g. "NIFTY"
+        range_size   : Number of strikes on each side (default 10, supports up to ±20)
+        custom_strike: If provided, centre the chain on this strike instead of ATM
+    """
     try:
         kite = get_kite()
         if kite is None:
@@ -31,18 +39,16 @@ def fetch_option_chain(symbol="NIFTY"):
         df = df[df["expiry"] == expiry]
 
         df["symbol"] = df["exchange"] + ":" + df["tradingsymbol"]
-        symbols = df["symbol"].tolist()[:300]
 
+        # ── Fetch ALL strikes (up to 300 symbols limit) ──────────────────────
+        symbols = df["symbol"].tolist()[:300]
         quotes = kite.quote(symbols)
 
         rows = []
-
         for _, row in df.iterrows():
             sym = row["symbol"]
-
             if sym in quotes:
                 q = quotes[sym]
-
                 rows.append({
                     "Strike": row["strike"],
                     "Type": row["instrument_type"],
@@ -52,7 +58,7 @@ def fetch_option_chain(symbol="NIFTY"):
         temp = pd.DataFrame(rows)
 
         calls = temp[temp["Type"] == "CE"]
-        puts = temp[temp["Type"] == "PE"]
+        puts  = temp[temp["Type"] == "PE"]
 
         merged = pd.merge(
             calls[["Strike", "OI"]],
@@ -61,24 +67,35 @@ def fetch_option_chain(symbol="NIFTY"):
             suffixes=("_Call", "_Put")
         )
 
-        final_df = pd.DataFrame({
-            "Strike": merged["Strike"],
+        full_df = pd.DataFrame({
+            "Strike":  merged["Strike"],
             "Call OI": merged["OI_Call"],
-            "Put OI": merged["OI_Put"]
-        }).sort_values("Strike")
+            "Put OI":  merged["OI_Put"]
+        }).sort_values("Strike").reset_index(drop=True)
 
-        # Spot
+        # ── Spot & ATM ────────────────────────────────────────────────────────
         spot = kite.ltp(["NSE:NIFTY 50"])["NSE:NIFTY 50"]["last_price"]
 
-        final_df["Distance"] = abs(final_df["Strike"] - spot)
-        atm_strike = final_df.loc[final_df["Distance"].idxmin(), "Strike"]
+        full_df["Distance"] = abs(full_df["Strike"] - spot)
+        atm_strike = full_df.loc[full_df["Distance"].idxmin(), "Strike"]
 
-        strikes = sorted(final_df["Strike"].unique())
-        atm_index = strikes.index(atm_strike)
+        # ── Centre strike (ATM or user-selected) ─────────────────────────────
+        centre = custom_strike if custom_strike else atm_strike
 
-        selected = strikes[max(0, atm_index-4): atm_index+5]
+        all_strikes = sorted(full_df["Strike"].unique().tolist())
 
-        filtered = final_df[final_df["Strike"].isin(selected)]
+        # Snap centre to nearest available strike
+        closest = min(all_strikes, key=lambda x: abs(x - centre))
+        centre_idx = all_strikes.index(closest)
+
+        lower_idx = max(0, centre_idx - range_size)
+        upper_idx = min(len(all_strikes) - 1, centre_idx + range_size)
+
+        selected_strikes = all_strikes[lower_idx : upper_idx + 1]
+
+        filtered = full_df[full_df["Strike"].isin(selected_strikes)].drop(
+            columns=["Distance"]
+        )
 
         return filtered, atm_strike, spot
 

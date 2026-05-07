@@ -125,12 +125,12 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 """, unsafe_allow_html=True)
 
 # ================= CONFIG =================
-API_KEY = st.secrets["API_KEY"]
+API_KEY    = st.secrets["API_KEY"]
 API_SECRET = st.secrets["API_SECRET"]
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
-kite = KiteConnect(api_key=API_KEY)
+kite     = KiteConnect(api_key=API_KEY)
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ================= SUPABASE HELPERS =================
@@ -163,7 +163,6 @@ if "validated" not in st.session_state:
 if "request_token" in st.query_params and not st.session_state.get("logged_in"):
 
     try:
-
         request_token = st.query_params["request_token"]
 
         if isinstance(request_token, list):
@@ -175,19 +174,14 @@ if "request_token" in st.query_params and not st.session_state.get("logged_in"):
         )
 
         access_token = data["access_token"]
-
         kite.set_access_token(access_token)
 
-        # Save to Supabase
         save_token(access_token)
 
-        st.session_state["logged_in"] = True
-        st.session_state["validated"] = True
-
-        # Let script fall through — no rerun/redirect
+        st.session_state["logged_in"]  = True
+        st.session_state["validated"]  = True
 
     except Exception as e:
-
         st.error(f"❌ Login failed: {e}")
         st.stop()
 
@@ -195,27 +189,22 @@ if "request_token" in st.query_params and not st.session_state.get("logged_in"):
 if not st.session_state.get("validated"):
 
     try:
-
         token = load_token()
 
         if token:
-
             kite.set_access_token(token)
-            kite.profile()  # Verify token is still valid
+            kite.profile()
 
             st.session_state["logged_in"] = True
             st.session_state["validated"] = True
 
         else:
-
             st.session_state["logged_in"] = False
 
     except Exception:
-
-        # Token expired or invalid — clear it from DB
         clear_token()
-        st.session_state["logged_in"] = False
-        st.session_state["validated"] = False
+        st.session_state["logged_in"]  = False
+        st.session_state["validated"]  = False
 
 # ================= LOGIN SCREEN =================
 if not st.session_state["logged_in"]:
@@ -255,47 +244,71 @@ auto_refresh = st.sidebar.checkbox(
     value=True
 )
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("🎯 Strike Settings")
+
+manual_strike = st.sidebar.number_input(
+    "Centre Strike Price (0 = use ATM)",
+    min_value=0,
+    max_value=100000,
+    value=0,
+    step=50,
+    help="Enter a strike price to centre the chain on. Leave 0 to auto-use ATM."
+)
+
+atm_range = st.sidebar.number_input(
+    "ATM Range (±N strikes)",
+    min_value=1,
+    max_value=20,
+    value=4,
+    step=1,
+    help="Number of strikes to show on each side of the centre strike."
+)
+
 # ================= LOGOUT =================
+st.sidebar.markdown("---")
 if st.sidebar.button("Logout"):
-
     clear_token()
-
-    st.session_state["logged_in"] = False
-    st.session_state["validated"] = False
-
+    st.session_state["logged_in"]  = False
+    st.session_state["validated"]  = False
     st.success("✅ Logged out successfully")
     st.rerun()
 
 # ================= AUTO REFRESH =================
 if auto_refresh:
-
-    st_autorefresh(
-        interval=60 * 1000,
-        key="live_refresh"
-    )
+    st_autorefresh(interval=60 * 1000, key="live_refresh")
 
 # ================= CACHE DATA =================
 @st.cache_data(ttl=30)
-def get_cached_data():
-    return fetch_option_chain("NIFTY")
+def get_cached_data(range_size, custom_strike):
+    return fetch_option_chain(
+        "NIFTY",
+        range_size=range_size,
+        custom_strike=custom_strike
+    )
 
 # ================= FETCH DATA =================
-result = get_cached_data()
+custom = int(manual_strike) if manual_strike != 0 else None
+result = get_cached_data(range_size=int(atm_range), custom_strike=custom)
 
 if result is None:
-
     st.error("❌ Unable to fetch Kite data")
     st.stop()
 
 df, atm_strike, spot = result
 
+# ================= RESOLVE SELECTED STRIKE =================
+all_strikes    = sorted(df["Strike"].unique().tolist())
+centre_strike  = custom if custom else int(atm_strike)
+closest_strike = min(all_strikes, key=lambda x: abs(x - centre_strike))
+
 # ================= LIVE METRICS =================
 st.subheader("📈 NIFTY Live Data")
 
-colA, colB = st.columns(2)
-
-colA.metric("NIFTY Spot", round(spot, 2))
-colB.metric("ATM Strike", int(atm_strike))
+colA, colB, colC = st.columns(3)
+colA.metric("NIFTY Spot",        round(spot, 2))
+colB.metric("ATM Strike (Auto)", int(atm_strike))
+colC.metric("Selected Strike",   int(closest_strike))
 
 # ================= ANALYSIS =================
 pcr, support, resistance = calculate_metrics(df)
@@ -306,18 +319,17 @@ lines = [line.strip() for line in ai_msg.split("\n") if line.strip()]
 
 try:
     sentiment = lines[0].replace("📊 Market Sentiment:", "").strip()
-    insight = lines[-1]
+    insight   = lines[-1]
 except Exception:
     sentiment = "Neutral"
-    insight = ai_msg
+    insight   = ai_msg
 
 # ================= DISPLAY METRICS =================
 col1, col2, col3, col4 = st.columns(4)
-
-col1.metric("PCR", round(pcr, 2))
-col2.metric("Support", int(support))
+col1.metric("PCR",        round(pcr, 2))
+col2.metric("Support",    int(support))
 col3.metric("Resistance", int(resistance))
-col4.metric("Trend", sentiment)
+col4.metric("Trend",      sentiment)
 
 # ================= AI INSIGHT =================
 st.subheader("🧠 AI Insight")
@@ -325,17 +337,16 @@ st.info(insight)
 
 # ================= TOTAL OI =================
 total_call = df["Call OI"].sum()
-total_put = df["Put OI"].sum()
+total_put  = df["Put OI"].sum()
 
 st.subheader("📊 Open Interest Strength")
 
 colX, colY = st.columns(2)
-
 colX.metric("🔴 Total Call OI", f"{int(total_call):,}")
-colY.metric("🟢 Total Put OI", f"{int(total_put):,}")
+colY.metric("🟢 Total Put OI",  f"{int(total_put):,}")
 
 # ================= OI CHART =================
-st.subheader("📉 OI Comparison (ATM ±4)")
+st.subheader(f"📉 OI Comparison — Strike {int(closest_strike)} ±{int(atm_range)}")
 
 fig = go.Figure()
 
@@ -349,12 +360,22 @@ fig.add_trace(go.Bar(
     name="Put OI", marker_color="green", opacity=0.65
 ))
 
+# Selected / custom strike line
 fig.add_vline(
-    x=atm_strike,
+    x=closest_strike,
     line_dash="dash",
     line_color="yellow",
-    annotation_text="ATM"
+    annotation_text=f"Selected ({int(closest_strike)})"
 )
+
+# Real ATM line (only show if different from selected)
+if closest_strike != int(atm_strike):
+    fig.add_vline(
+        x=atm_strike,
+        line_dash="dot",
+        line_color="cyan",
+        annotation_text=f"ATM ({int(atm_strike)})"
+    )
 
 fig.update_layout(
     template="plotly_dark",
@@ -370,7 +391,7 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 # ================= OPTION CHAIN TABLE =================
-st.subheader("📋 ATM ±4 Option Chain")
+st.subheader(f"📋 Strike {int(closest_strike)} ±{int(atm_range)} Option Chain")
 
 st.dataframe(
     df.sort_values("Strike"),
