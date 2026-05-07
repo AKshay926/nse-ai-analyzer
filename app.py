@@ -246,9 +246,26 @@ if not st.session_state["logged_in"]:
 
 # ================= MAIN APP =================
 st.title("📊 PulseIQ Dashboard")
+
 token = load_token()
 
 st.write("SUPABASE TOKEN:", token)
+
+try:
+
+    current_token = kite.access_token
+
+    st.write("CURRENT TOKEN:", current_token)
+
+    if st.button("SAVE TOKEN TO SUPABASE"):
+
+        save_token(current_token)
+
+        st.success("TOKEN SAVED TO SUPABASE")
+
+except Exception as e:
+
+    st.error(e)
 # ================= SIDEBAR =================
 st.sidebar.header("⚙ Settings")
 
