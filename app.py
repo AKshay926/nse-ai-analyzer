@@ -431,12 +431,32 @@ if not st.session_state["logged_in"]:
             z-index: 999;
         }}
         .login-features {{
-            font-size: 20px;
-            color: rgba(255,255,255,0.88);
-            line-height: 2.2;
-            margin-bottom: 22px;
-            text-shadow: 0 0 14px rgba(0,0,0,0.9);
+         display: flex;
+         flex-direction: column;
+            fgap: 18px;
+
+          font-family:
+          "Inter",
+          "Segoe UI",
+          sans-serif;
+
+          font-size: 24px;
+
+          font-weight: 700;
+
+         letter-spacing: 0.4px;
+
+          color: rgba(255,255,255,0.96);
+
+           line-height: 1.6;
+
+           text-shadow:
+           0 0 8px rgba(255,255,255,0.08),
+           0 0 18px rgba(0,180,255,0.12);
+
+         margin-bottom: 28px;
         }}
+        .
         .login-btn {{
             background: rgba(37,99,235,0.92);
             color: white;
@@ -493,10 +513,20 @@ if not st.session_state["logged_in"]:
           <!-- BOTTOM LEFT: features + login -->
           <div class="bottom-left">
             <div class="login-features">
-              &#128200; Live Market Analytics<br/>
-              &#129504; AI-Powered Options Insights<br/>
-              &#128293; Real-Time OI Tracking
+
+             <div class="feature-item">
+               📈 Live Market Analytics
             </div>
+
+             <div class="feature-item">
+              🧠 AI-Powered Options Insights
+            </div>
+
+            <div class="feature-item">
+             🔥 Real-Time OI Tracking
+             </div>
+
+        </div>
             <a href="{login_url}" target="_top" class="login-btn">
               &#128272; Login with Zerodha
             </a>
