@@ -595,11 +595,16 @@ if not st.session_state["logged_in"]:
              🔥 Real-Time OI Tracking
              </div>
 
-        </div>
-            <a href="{login_url}" target="_top" class="login-btn">
-              &#128272; Login with Zerodha
-            </a>
-          </div>
+       </div>
+
+<button
+    class="login-btn"
+    onclick="window.parent.location.href='{login_url}'"
+>
+    &#128272; Login with Zerodha
+</button>
+
+</div>
 
         </body>
         </html>
