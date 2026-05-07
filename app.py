@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ================= LOGO HTML =================
+# ================= LOGO HTML (sidebar + dashboard) =================
 LOGO_HTML = """
 <style>
 .logo-wrapper {
@@ -295,25 +295,31 @@ if not st.session_state["logged_in"]:
         <head>
         <style>
         * {{ margin:0; padding:0; box-sizing:border-box; }}
+
         body {{
             background: transparent;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            gap: 32px;
             font-family: Arial, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
         }}
-        .login-logo-row {{
+
+        /* ── TOP RIGHT: Logo ── */
+        .top-right {{
+            position: fixed;
+            top: 70px;
+            right: 40px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
+            z-index: 999;
         }}
+
         .ln-bolt-wrap {{
             position: relative;
-            width: 110px;
-            height: 140px;
+            width: 90px;
+            height: 115px;
             flex-shrink: 0;
         }}
         .ln-bolt-ring {{
@@ -325,12 +331,12 @@ if not st.session_state["logged_in"]:
             opacity: 0;
             animation: lnRingPulse 3s ease-out infinite;
         }}
-        .ln-bolt-ring:nth-child(1) {{ width:50px; height:50px; animation-delay:0s; }}
-        .ln-bolt-ring:nth-child(2) {{ width:50px; height:50px; animation-delay:1s; }}
-        .ln-bolt-ring:nth-child(3) {{ width:50px; height:50px; animation-delay:2s; }}
+        .ln-bolt-ring:nth-child(1) {{ width:44px; height:44px; animation-delay:0s; }}
+        .ln-bolt-ring:nth-child(2) {{ width:44px; height:44px; animation-delay:1s; }}
+        .ln-bolt-ring:nth-child(3) {{ width:44px; height:44px; animation-delay:2s; }}
         @keyframes lnRingPulse {{
-            0%   {{ width:50px;  height:50px;  opacity:0.8; }}
-            100% {{ width:170px; height:170px; opacity:0;   }}
+            0%   {{ width:44px;  height:44px;  opacity:0.8; }}
+            100% {{ width:150px; height:150px; opacity:0;   }}
         }}
         .ln-bolt-svg {{
             position: absolute;
@@ -370,13 +376,15 @@ if not st.session_state["logged_in"]:
             30%  {{ opacity:1; }}
             100% {{ opacity:0; transform:translate(20px,-20px) scale(0); }}
         }}
+
         .ln-text-col {{
             display: flex;
             flex-direction: column;
             gap: 4px;
+            text-align: right;
         }}
         .ln-brand-name {{
-            font-size: 82px;
+            font-size: 62px;
             font-weight: 900;
             font-style: italic;
             color: #ffffff;
@@ -390,6 +398,7 @@ if not st.session_state["logged_in"]:
             display: flex;
             align-items: center;
             gap: 6px;
+            justify-content: flex-end;
         }}
         @keyframes lnTextGlow {{
             0%,100% {{ text-shadow: 0 0 10px rgba(255,255,255,0.95), 0 0 25px rgba(0,190,255,0.7), 0 0 55px rgba(0,130,255,0.5); }}
@@ -406,27 +415,35 @@ if not st.session_state["logged_in"]:
             50%      {{ opacity:0.5; filter: drop-shadow(0 0 10px #00cfff) drop-shadow(0 0 20px #0099ff); }}
         }}
         .ln-brand-sub {{
-            font-size: 12px;
-            letter-spacing: 4px;
+            font-size: 11px;
+            letter-spacing: 3.5px;
             color: #00cfff;
             text-transform: uppercase;
             opacity: 0.8;
             text-shadow: 0 0 10px #00cfff;
         }}
+
+        /* ── BOTTOM LEFT: features + button ── */
+        .bottom-left {{
+            position: fixed;
+            bottom: 90px;
+            left: 40px;
+            z-index: 999;
+        }}
         .login-features {{
-            font-size: 18px;
+            font-size: 20px;
             color: rgba(255,255,255,0.88);
-            line-height: 2.4;
-            text-align: center;
-            text-shadow: 0 0 12px rgba(0,0,0,0.8);
+            line-height: 2.2;
+            margin-bottom: 22px;
+            text-shadow: 0 0 14px rgba(0,0,0,0.9);
         }}
         .login-btn {{
             background: rgba(37,99,235,0.92);
             color: white;
-            padding: 14px 40px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             letter-spacing: 1px;
@@ -439,26 +456,12 @@ if not st.session_state["logged_in"]:
         </head>
         <body>
 
-          <div class="login-logo-row">
-            <div class="ln-bolt-wrap">
-              <div class="ln-bolt-ring"></div>
-              <div class="ln-bolt-ring"></div>
-              <div class="ln-bolt-ring"></div>
-              <svg class="ln-bolt-svg" width="90" height="115"
-                viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="38,2 14,42 30,42 22,78 46,38 30,38"
-                  fill="#00cfff" stroke="#ffffff" stroke-width="1"/>
-              </svg>
-              <div class="ln-spark"></div>
-              <div class="ln-spark"></div>
-              <div class="ln-spark"></div>
-              <div class="ln-spark"></div>
-              <div class="ln-spark"></div>
-            </div>
+          <!-- TOP RIGHT: Logo -->
+          <div class="top-right">
             <div class="ln-text-col">
               <div class="ln-brand-name">
                 PulseIQ
-                <svg width="105" height="44" viewBox="0 0 110 44" fill="none"
+                <svg width="90" height="38" viewBox="0 0 110 44" fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   style="display:inline-block;vertical-align:middle;">
                   <polyline class="ln-pulse-line"
@@ -470,22 +473,39 @@ if not st.session_state["logged_in"]:
               </div>
               <div class="ln-brand-sub">AI-Powered Option Chain Intelligence</div>
             </div>
+            <div class="ln-bolt-wrap">
+              <div class="ln-bolt-ring"></div>
+              <div class="ln-bolt-ring"></div>
+              <div class="ln-bolt-ring"></div>
+              <svg class="ln-bolt-svg" width="72" height="92"
+                viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="38,2 14,42 30,42 22,78 46,38 30,38"
+                  fill="#00cfff" stroke="#ffffff" stroke-width="1"/>
+              </svg>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+            </div>
           </div>
 
-          <div class="login-features">
-            &#128200; Live Market Analytics<br/>
-            &#129504; AI-Powered Options Insights<br/>
-            &#128293; Real-Time OI Tracking
+          <!-- BOTTOM LEFT: features + login -->
+          <div class="bottom-left">
+            <div class="login-features">
+              &#128200; Live Market Analytics<br/>
+              &#129504; AI-Powered Options Insights<br/>
+              &#128293; Real-Time OI Tracking
+            </div>
+            <a href="{login_url}" target="_top" class="login-btn">
+              &#128272; Login with Zerodha
+            </a>
           </div>
-
-          <a href="{login_url}" target="_top" class="login-btn">
-            &#128272; Login with Zerodha
-          </a>
 
         </body>
         </html>
         """,
-        height=500,
+        height=800,
     )
 
     st.stop()
