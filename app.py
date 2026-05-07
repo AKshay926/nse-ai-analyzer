@@ -32,15 +32,16 @@ LOGO_HTML = """
     height: 90px;
     flex-shrink: 0;
 }
-.bolt {
+.bolt-svg {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 64px;
-    color: #00cfff;
-    filter: drop-shadow(0 0 6px #00cfff) drop-shadow(0 0 18px #00cfff) drop-shadow(0 0 40px #0099ff);
+    filter:
+        drop-shadow(0 0 4px #00cfff)
+        drop-shadow(0 0 14px #00cfff)
+        drop-shadow(0 0 35px #0099ff)
+        drop-shadow(0 0 70px #006fff);
     animation: boltFlicker 3s ease-in-out infinite;
-    line-height: 1;
 }
 .bolt-ring {
     position: absolute;
@@ -54,23 +55,29 @@ LOGO_HTML = """
 .bolt-ring:nth-child(1) { width:40px; height:40px; animation-delay:0s; }
 .bolt-ring:nth-child(2) { width:40px; height:40px; animation-delay:1s; }
 .bolt-ring:nth-child(3) { width:40px; height:40px; animation-delay:2s; }
-@keyframes boltFlicker {
-    0%,100% { opacity:1; filter: drop-shadow(0 0 6px #00cfff) drop-shadow(0 0 18px #00cfff) drop-shadow(0 0 40px #0099ff); }
-    89% { opacity:0.5; filter: drop-shadow(0 0 2px #00cfff); }
-    90% { opacity:1; }
-}
 @keyframes ringPulse {
-    0% { width:40px; height:40px; opacity:0.7; }
-    100% { width:110px; height:110px; opacity:0; }
+    0%   { width:40px;  height:40px;  opacity:0.7; }
+    100% { width:110px; height:110px; opacity:0;   }
+}
+@keyframes boltFlicker {
+    0%,100% { opacity:1;   filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }
+    88%     { opacity:1;   }
+    89%     { opacity:0.4; filter: drop-shadow(0 0 2px #00cfff); }
+    90%     { opacity:1;   }
+    94%     { opacity:0.7; }
+    95%     { opacity:1;   }
 }
 .brand-name {
-    font-size: 48px;
+    font-size: 48px !important;
     font-weight: 900;
     font-style: italic;
     color: #ffffff !important;
     letter-spacing: -1px;
     line-height: 1;
-    text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(0,180,255,0.6), 0 0 40px rgba(0,120,255,0.4);
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.9),
+        0 0 20px rgba(0,180,255,0.6),
+        0 0 40px rgba(0,120,255,0.4);
     animation: textGlow 3s ease-in-out infinite;
     display: flex;
     align-items: center;
@@ -78,10 +85,10 @@ LOGO_HTML = """
 }
 @keyframes textGlow {
     0%,100% { text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(0,180,255,0.6), 0 0 40px rgba(0,120,255,0.4); }
-    50% { text-shadow: 0 0 16px #fff, 0 0 32px rgba(0,200,255,0.9), 0 0 60px rgba(0,150,255,0.6); }
+    50%      { text-shadow: 0 0 16px #fff, 0 0 32px rgba(0,200,255,0.9), 0 0 60px rgba(0,150,255,0.6); }
 }
 .brand-sub {
-    font-size: 10px;
+    font-size: 10px !important;
     letter-spacing: 3px;
     color: #00cfff !important;
     text-transform: uppercase;
@@ -96,8 +103,8 @@ LOGO_HTML = """
 }
 @keyframes drawPulse { to { stroke-dashoffset: 0; } }
 @keyframes pulseFade {
-    0%,100% { opacity:1; filter: drop-shadow(0 0 3px #00cfff); }
-    50% { opacity:0.5; filter: drop-shadow(0 0 8px #00cfff); }
+    0%,100% { opacity:1;   filter: drop-shadow(0 0 3px #00cfff) drop-shadow(0 0 8px #0099ff); }
+    50%      { opacity:0.5; filter: drop-shadow(0 0 10px #00cfff) drop-shadow(0 0 20px #0099ff); }
 }
 </style>
 
@@ -106,7 +113,10 @@ LOGO_HTML = """
     <div class="bolt-ring"></div>
     <div class="bolt-ring"></div>
     <div class="bolt-ring"></div>
-    <div class="bolt">&#9889;</div>
+    <svg class="bolt-svg" width="52" height="68" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="38,2 14,42 30,42 22,78 46,38 30,38"
+        fill="#00cfff" stroke="#ffffff" stroke-width="1"/>
+    </svg>
   </div>
   <div>
     <div class="brand-name">
@@ -180,110 +190,6 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
-
-.login-page-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    gap: 32px;
-}
-
-.login-logo-wrap {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-family: Arial, sans-serif;
-}
-
-.login-bolt-wrap {
-    position: relative;
-    width: 100px;
-    height: 130px;
-    flex-shrink: 0;
-}
-
-.login-bolt {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 90px;
-    color: #00cfff;
-    filter: drop-shadow(0 0 8px #00cfff) drop-shadow(0 0 24px #00cfff) drop-shadow(0 0 60px #0099ff);
-    animation: boltFlicker 3s ease-in-out infinite;
-    line-height: 1;
-}
-
-.login-bolt-ring {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border: 1px solid #00cfff;
-    opacity: 0;
-    animation: loginRingPulse 3s ease-out infinite;
-}
-.login-bolt-ring:nth-child(1) { width:50px; height:50px; animation-delay:0s; }
-.login-bolt-ring:nth-child(2) { width:50px; height:50px; animation-delay:1s; }
-.login-bolt-ring:nth-child(3) { width:50px; height:50px; animation-delay:2s; }
-
-@keyframes loginRingPulse {
-    0% { width:50px; height:50px; opacity:0.8; }
-    100% { width:160px; height:160px; opacity:0; }
-}
-
-.login-brand-name {
-    font-size: 80px !important;
-    font-weight: 900;
-    font-style: italic;
-    color: #ffffff !important;
-    letter-spacing: -2px;
-    line-height: 1;
-    text-shadow: 0 0 12px rgba(255,255,255,0.95), 0 0 28px rgba(0,180,255,0.7), 0 0 55px rgba(0,120,255,0.5);
-    animation: textGlow 3s ease-in-out infinite;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.login-brand-sub {
-    font-size: 13px !important;
-    letter-spacing: 4px;
-    color: #00cfff !important;
-    text-transform: uppercase;
-    opacity: 0.8;
-    text-shadow: 0 0 10px #00cfff;
-    margin-top: 4px;
-}
-
-.login-features {
-    font-size: 18px !important;
-    color: rgba(255,255,255,0.88) !important;
-    line-height: 2.2;
-    text-align: center;
-    text-shadow: 0 0 12px rgba(0,0,0,0.8);
-}
-
-.login-btn-wrap a {
-    text-decoration: none;
-}
-
-.login-btn {
-    background: rgba(37,99,235,0.92);
-    color: white !important;
-    padding: 14px 36px;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 1px;
-    box-shadow: 0 0 20px rgba(37,99,235,0.5);
-    transition: all 0.2s;
-}
-
-.login-btn:hover { opacity: 0.88; box-shadow: 0 0 30px rgba(37,99,235,0.7); }
 
 </style>
 """, unsafe_allow_html=True)
@@ -383,30 +289,185 @@ if not st.session_state["logged_in"]:
 
     st.markdown(
         f"""
+        <style>
+        .login-page-wrap {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            gap: 32px;
+        }}
+        .login-logo-row {{
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }}
+        .ln-bolt-wrap {{
+            position: relative;
+            width: 110px;
+            height: 140px;
+            flex-shrink: 0;
+        }}
+        .ln-bolt-ring {{
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid #00cfff;
+            opacity: 0;
+            animation: lnRingPulse 3s ease-out infinite;
+        }}
+        .ln-bolt-ring:nth-child(1) {{ width:50px; height:50px; animation-delay:0s; }}
+        .ln-bolt-ring:nth-child(2) {{ width:50px; height:50px; animation-delay:1s; }}
+        .ln-bolt-ring:nth-child(3) {{ width:50px; height:50px; animation-delay:2s; }}
+        @keyframes lnRingPulse {{
+            0%   {{ width:50px;  height:50px;  opacity:0.8; }}
+            100% {{ width:170px; height:170px; opacity:0;   }}
+        }}
+        .ln-bolt-svg {{
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            filter:
+                drop-shadow(0 0 4px #00cfff)
+                drop-shadow(0 0 14px #00cfff)
+                drop-shadow(0 0 35px #0099ff)
+                drop-shadow(0 0 70px #006fff);
+            animation: lnBoltFlicker 3s ease-in-out infinite;
+        }}
+        @keyframes lnBoltFlicker {{
+            0%,100% {{ opacity:1;   filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }}
+            88%     {{ opacity:1;   }}
+            89%     {{ opacity:0.4; filter: drop-shadow(0 0 2px #00cfff); }}
+            90%     {{ opacity:1;   }}
+            94%     {{ opacity:0.7; }}
+            95%     {{ opacity:1;   }}
+        }}
+        .ln-spark {{
+            position: absolute;
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: #00cfff;
+            box-shadow: 0 0 6px 2px #00cfff;
+            opacity: 0;
+            animation: lnSpark 3s ease-in-out infinite;
+        }}
+        .ln-spark:nth-child(5) {{ top:15%; left:8%;  animation-delay:0.3s; }}
+        .ln-spark:nth-child(6) {{ top:20%; left:85%; animation-delay:1.1s; }}
+        .ln-spark:nth-child(7) {{ top:75%; left:80%; animation-delay:0.7s; }}
+        .ln-spark:nth-child(8) {{ top:80%; left:12%; animation-delay:1.9s; }}
+        .ln-spark:nth-child(9) {{ top:45%; left:92%; animation-delay:2.4s; }}
+        @keyframes lnSpark {{
+            0%   {{ opacity:0; transform:translate(0,0) scale(1);   }}
+            30%  {{ opacity:1; }}
+            100% {{ opacity:0; transform:translate(20px,-20px) scale(0); }}
+        }}
+        .ln-text-col {{
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }}
+        .ln-brand-name {{
+            font-size: 82px !important;
+            font-weight: 900;
+            font-style: italic;
+            color: #ffffff !important;
+            letter-spacing: -2px;
+            line-height: 1;
+            text-shadow:
+                0 0 10px rgba(255,255,255,0.95),
+                0 0 25px rgba(0,190,255,0.7),
+                0 0 55px rgba(0,130,255,0.5);
+            animation: lnTextGlow 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }}
+        @keyframes lnTextGlow {{
+            0%,100% {{ text-shadow: 0 0 10px rgba(255,255,255,0.95), 0 0 25px rgba(0,190,255,0.7), 0 0 55px rgba(0,130,255,0.5); }}
+            50%      {{ text-shadow: 0 0 18px #fff, 0 0 38px rgba(0,210,255,0.95), 0 0 70px rgba(0,160,255,0.65); }}
+        }}
+        .ln-pulse-line {{
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: lnDrawPulse 2s ease forwards, lnPulseFade 3s ease-in-out 2s infinite;
+        }}
+        @keyframes lnDrawPulse {{ to {{ stroke-dashoffset: 0; }} }}
+        @keyframes lnPulseFade {{
+            0%,100% {{ opacity:1;   filter: drop-shadow(0 0 3px #00cfff) drop-shadow(0 0 8px #0099ff); }}
+            50%      {{ opacity:0.5; filter: drop-shadow(0 0 10px #00cfff) drop-shadow(0 0 20px #0099ff); }}
+        }}
+        .ln-brand-sub {{
+            font-size: 12px !important;
+            letter-spacing: 4px;
+            color: #00cfff !important;
+            text-transform: uppercase;
+            opacity: 0.8;
+            text-shadow: 0 0 10px #00cfff;
+        }}
+        .login-features {{
+            font-size: 18px !important;
+            color: rgba(255,255,255,0.88) !important;
+            line-height: 2.4;
+            text-align: center;
+            text-shadow: 0 0 12px rgba(0,0,0,0.8);
+        }}
+        .login-btn {{
+            background: rgba(37,99,235,0.92);
+            color: white !important;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            box-shadow: 0 0 24px rgba(37,99,235,0.55);
+        }}
+        .login-btn:hover {{ opacity: 0.88; }}
+        </style>
+
         <div class="login-page-wrap">
 
-          <div class="login-logo-wrap">
-            <div class="login-bolt-wrap">
-              <div class="login-bolt-ring"></div>
-              <div class="login-bolt-ring"></div>
-              <div class="login-bolt-ring"></div>
-              <div class="login-bolt">&#9889;</div>
+          <div class="login-logo-row">
+
+            <div class="ln-bolt-wrap">
+              <div class="ln-bolt-ring"></div>
+              <div class="ln-bolt-ring"></div>
+              <div class="ln-bolt-ring"></div>
+              <svg class="ln-bolt-svg" width="90" height="115"
+                viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+                <polygon
+                  points="38,2 14,42 30,42 22,78 46,38 30,38"
+                  fill="#00cfff"
+                  stroke="#ffffff"
+                  stroke-width="1"
+                />
+              </svg>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
+              <div class="ln-spark"></div>
             </div>
-            <div>
-              <div class="login-brand-name">
+
+            <div class="ln-text-col">
+              <div class="ln-brand-name">
                 PulseIQ
-                <svg width="100" height="42" viewBox="0 0 110 44" fill="none"
+                <svg width="105" height="44" viewBox="0 0 110 44" fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   style="display:inline-block;vertical-align:middle;">
-                  <polyline class="pulse-line"
+                  <polyline class="ln-pulse-line"
                     points="0,22 15,22 22,8 28,36 36,4 44,38 50,22 62,22 68,14 74,30 80,22 110,22"
                     stroke="#00cfff" stroke-width="2.5"
                     stroke-linecap="round" stroke-linejoin="round" fill="none"
-                    style="filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 10px #0099ff);"/>
+                    style="filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 12px #0099ff);"/>
                 </svg>
               </div>
-              <div class="login-brand-sub">AI-Powered Option Chain Intelligence</div>
+              <div class="ln-brand-sub">AI-Powered Option Chain Intelligence</div>
             </div>
+
           </div>
 
           <div class="login-features">
@@ -415,11 +476,9 @@ if not st.session_state["logged_in"]:
             &#128293; Real-Time OI Tracking
           </div>
 
-          <div class="login-btn-wrap">
-            <a href="{login_url}" target="_self">
-              <button class="login-btn">&#128272; Login with Zerodha</button>
-            </a>
-          </div>
+          <a href="{login_url}" target="_self" style="text-decoration:none;">
+            <button class="login-btn">&#128272; Login with Zerodha</button>
+          </a>
 
         </div>
         """,
