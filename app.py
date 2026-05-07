@@ -432,50 +432,101 @@ if not st.session_state["logged_in"]:
         }}
          .login-features {{
 
-    display: flex;
+         display: flex;
 
-    flex-direction: column;
+         flex-direction: column;
 
-    gap: 18px;
+          gap: 24px;
 
-    font-family:
+         font-family:
+        "SF Pro Display",
         "Inter",
-        "Segoe UI",
+        "Poppins",
         sans-serif;
 
-    font-size: 24px;
+        font-size: 22px;
 
-    font-weight: 700;
+         font-weight: 600;
 
-    letter-spacing: 0.4px;
+       letter-spacing: -0.3px;
 
-    color: rgba(255,255,255,0.96);
+       color: rgba(255,255,255,0.96);
 
-    line-height: 1.6;
+    line-height: 1.4;
 
-    text-shadow:
-        0 0 8px rgba(255,255,255,0.08),
-        0 0 18px rgba(0,180,255,0.12);
+    margin-bottom: 34px;
 
-    margin-bottom: 28px;
+    
       }}
         .feature-item {{
+                       position: relative;
 
-    position: relative;
+    padding: 12px 18px;
 
-    padding-left: 8px;
+    border-radius: 16px;
 
-    transition: all 0.25s ease;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(20,20,30,0.42),
+            rgba(10,10,15,0.22)
+        );
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+
+    backdrop-filter: blur(8px);
+
+    box-shadow:
+        0 0 20px rgba(0,140,255,0.05);
+
+    transition:
+        all 0.28s ease;
+
+    overflow: hidden;
+    
      }}
+               .feature-item::before {{
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -120%;
+
+    width: 120%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.08),
+            transparent
+        );
+
+    transition: 0.7s;
+}}
+
+.feature-item:hover::before {{
+
+    left: 120%;
+}}
 
 .feature-item:hover {{
+                              transform:
+        translateX(8px)
+        scale(1.02);
 
-    transform: translateX(6px);
+    border:
+        1px solid rgba(56,189,248,0.22);
 
-    color: #38bdf8;
+    box-shadow:
+        0 0 24px rgba(56,189,248,0.16);
 
-    text-shadow:
-        0 0 12px rgba(56,189,248,0.65);
+    color: #7dd3fc;
+    
         }}
         .login-btn {{
             background: rgba(37,99,235,0.92);
