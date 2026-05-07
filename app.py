@@ -15,6 +15,117 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ================= LOGO HTML =================
+LOGO_HTML = """
+<style>
+.logo-wrapper {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: Arial, sans-serif;
+    padding: 8px 0;
+}
+.bolt-wrap {
+    position: relative;
+    width: 70px;
+    height: 90px;
+    flex-shrink: 0;
+}
+.bolt {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+    color: #00cfff;
+    filter: drop-shadow(0 0 6px #00cfff) drop-shadow(0 0 18px #00cfff) drop-shadow(0 0 40px #0099ff);
+    animation: boltFlicker 3s ease-in-out infinite;
+    line-height: 1;
+}
+.bolt-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid #00cfff;
+    opacity: 0;
+    animation: ringPulse 3s ease-out infinite;
+}
+.bolt-ring:nth-child(1) { width:40px; height:40px; animation-delay:0s; }
+.bolt-ring:nth-child(2) { width:40px; height:40px; animation-delay:1s; }
+.bolt-ring:nth-child(3) { width:40px; height:40px; animation-delay:2s; }
+@keyframes boltFlicker {
+    0%,100% { opacity:1; filter: drop-shadow(0 0 6px #00cfff) drop-shadow(0 0 18px #00cfff) drop-shadow(0 0 40px #0099ff); }
+    89% { opacity:0.5; filter: drop-shadow(0 0 2px #00cfff); }
+    90% { opacity:1; }
+}
+@keyframes ringPulse {
+    0% { width:40px; height:40px; opacity:0.7; }
+    100% { width:110px; height:110px; opacity:0; }
+}
+.brand-name {
+    font-size: 48px;
+    font-weight: 900;
+    font-style: italic;
+    color: #ffffff !important;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(0,180,255,0.6), 0 0 40px rgba(0,120,255,0.4);
+    animation: textGlow 3s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+@keyframes textGlow {
+    0%,100% { text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 20px rgba(0,180,255,0.6), 0 0 40px rgba(0,120,255,0.4); }
+    50% { text-shadow: 0 0 16px #fff, 0 0 32px rgba(0,200,255,0.9), 0 0 60px rgba(0,150,255,0.6); }
+}
+.brand-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #00cfff !important;
+    text-transform: uppercase;
+    opacity: 0.75;
+    text-shadow: 0 0 8px #00cfff;
+    margin-top: 2px;
+}
+.pulse-line {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: drawPulse 2s ease forwards, pulseFade 3s ease-in-out 2s infinite;
+}
+@keyframes drawPulse { to { stroke-dashoffset: 0; } }
+@keyframes pulseFade {
+    0%,100% { opacity:1; filter: drop-shadow(0 0 3px #00cfff); }
+    50% { opacity:0.5; filter: drop-shadow(0 0 8px #00cfff); }
+}
+</style>
+
+<div class="logo-wrapper">
+  <div class="bolt-wrap">
+    <div class="bolt-ring"></div>
+    <div class="bolt-ring"></div>
+    <div class="bolt-ring"></div>
+    <div class="bolt">&#9889;</div>
+  </div>
+  <div>
+    <div class="brand-name">
+      PulseIQ
+      <svg width="80" height="34" viewBox="0 0 110 44" fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style="display:inline-block;vertical-align:middle;">
+        <polyline class="pulse-line"
+          points="0,22 15,22 22,8 28,36 36,4 44,38 50,22 62,22 68,14 74,30 80,22 110,22"
+          stroke="#00cfff" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" fill="none"
+          style="filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 10px #0099ff);"/>
+      </svg>
+    </div>
+    <div class="brand-sub">AI-Powered Option Chain Intelligence</div>
+  </div>
+</div>
+"""
+
 # ================= CUSTOM CSS =================
 st.markdown("""
 <style>
@@ -70,74 +181,109 @@ h1, h2, h3, h4, h5, h6, p, div, label, span { color: white !important; }
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
 
-.top-right-brand {
-    position: fixed;
-    top: 95px;
-    right: 40px;
-    text-align: right;
-    z-index: 999;
+.login-page-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 32px;
 }
 
-.brand-title {
-    color: white;
-    font-size: 58px;
+.login-logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.login-bolt-wrap {
+    position: relative;
+    width: 100px;
+    height: 130px;
+    flex-shrink: 0;
+}
+
+.login-bolt {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 90px;
+    color: #00cfff;
+    filter: drop-shadow(0 0 8px #00cfff) drop-shadow(0 0 24px #00cfff) drop-shadow(0 0 60px #0099ff);
+    animation: boltFlicker 3s ease-in-out infinite;
+    line-height: 1;
+}
+
+.login-bolt-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid #00cfff;
+    opacity: 0;
+    animation: loginRingPulse 3s ease-out infinite;
+}
+.login-bolt-ring:nth-child(1) { width:50px; height:50px; animation-delay:0s; }
+.login-bolt-ring:nth-child(2) { width:50px; height:50px; animation-delay:1s; }
+.login-bolt-ring:nth-child(3) { width:50px; height:50px; animation-delay:2s; }
+
+@keyframes loginRingPulse {
+    0% { width:50px; height:50px; opacity:0.8; }
+    100% { width:160px; height:160px; opacity:0; }
+}
+
+.login-brand-name {
+    font-size: 80px !important;
+    font-weight: 900;
     font-style: italic;
-    font-weight: 800;
-    text-shadow: 0 0 18px rgba(0,0,0,0.7);
+    color: #ffffff !important;
+    letter-spacing: -2px;
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(255,255,255,0.95), 0 0 28px rgba(0,180,255,0.7), 0 0 55px rgba(0,120,255,0.5);
+    animation: textGlow 3s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.brand-subtitle {
-    color: rgba(255,255,255,0.82);
-    font-size: 13px;
-    letter-spacing: 1px;
-    opacity: 0.82;
-    margin-top: -6px;
-    letter-spacing: 0.5px;
+.login-brand-sub {
+    font-size: 13px !important;
+    letter-spacing: 4px;
+    color: #00cfff !important;
+    text-transform: uppercase;
+    opacity: 0.8;
+    text-shadow: 0 0 10px #00cfff;
+    margin-top: 4px;
 }
 
-.bottom-left {
-    position: fixed;
-    bottom: 90px;
-    left: 40px;
-    z-index: 999;
+.login-features {
+    font-size: 18px !important;
+    color: rgba(255,255,255,0.88) !important;
+    line-height: 2.2;
+    text-align: center;
+    text-shadow: 0 0 12px rgba(0,0,0,0.8);
 }
 
-.feature-points {
-    color: white;
-    font-size: 20px;
-    line-height: 2;
-    margin-bottom: 18px;
-    text-shadow: 0 0 18px rgba(0,0,0,0.8);
+.login-btn-wrap a {
+    text-decoration: none;
 }
 
 .login-btn {
-    background: linear-gradient(
-        135deg,
-        rgba(37,99,235,0.95),
-        rgba(29,78,216,0.95)
-    );
-
-    color: white;
-    padding: 10px 20px;
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(37,99,235,0.92);
+    color: white !important;
+    padding: 14px 36px;
+    border: none;
     border-radius: 12px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-
-    box-shadow:
-        0 0 18px rgba(37,99,235,0.28);
-
-    transition: all 0.25s ease;
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(37,99,235,0.5);
+    transition: all 0.2s;
 }
 
-.login-btn:hover {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 0 28px rgba(37,99,235,0.45);
-}
+.login-btn:hover { opacity: 0.88; box-shadow: 0 0 30px rgba(37,99,235,0.7); }
 
 </style>
 """, unsafe_allow_html=True)
@@ -158,7 +304,7 @@ def save_token(token: str):
         "updated_at": "now()"
     }).eq("id", "main").execute()
 
-def load_token() -> str | None:
+def load_token():
     res = supabase.table("sessions").select("access_token").eq("id", "main").execute()
     if res.data and res.data[0]["access_token"]:
         return res.data[0]["access_token"]
@@ -195,14 +341,10 @@ if "request_token" in st.query_params and not st.session_state.get("logged_in"):
         access_token = data["access_token"]
 
         kite.set_access_token(access_token)
-
-        # Save to Supabase
         save_token(access_token)
 
         st.session_state["logged_in"] = True
         st.session_state["validated"] = True
-
-        # Let script fall through — no rerun/redirect
 
     except Exception as e:
 
@@ -219,7 +361,7 @@ if not st.session_state.get("validated"):
         if token:
 
             kite.set_access_token(token)
-            kite.profile()  # Verify token is still valid
+            kite.profile()
 
             st.session_state["logged_in"] = True
             st.session_state["validated"] = True
@@ -230,7 +372,6 @@ if not st.session_state.get("validated"):
 
     except Exception:
 
-        # Token expired or invalid — clear it from DB
         clear_token()
         st.session_state["logged_in"] = False
         st.session_state["validated"] = False
@@ -242,19 +383,44 @@ if not st.session_state["logged_in"]:
 
     st.markdown(
         f"""
-        <div class="top-right-brand">
-            <div class="brand-title">&#9889; PulseIQ</div>
-            <div class="brand-subtitle">AI-Powered Option Chain Intelligence</div>
-        </div>
+        <div class="login-page-wrap">
 
-        <div class="bottom-left">
-            <div class="feature-points">
-                &#128200; Live Market Analytics<br/>
-                &#129504; AI-Powered Options Insights
+          <div class="login-logo-wrap">
+            <div class="login-bolt-wrap">
+              <div class="login-bolt-ring"></div>
+              <div class="login-bolt-ring"></div>
+              <div class="login-bolt-ring"></div>
+              <div class="login-bolt">&#9889;</div>
             </div>
+            <div>
+              <div class="login-brand-name">
+                PulseIQ
+                <svg width="100" height="42" viewBox="0 0 110 44" fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style="display:inline-block;vertical-align:middle;">
+                  <polyline class="pulse-line"
+                    points="0,22 15,22 22,8 28,36 36,4 44,38 50,22 62,22 68,14 74,30 80,22 110,22"
+                    stroke="#00cfff" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" fill="none"
+                    style="filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 10px #0099ff);"/>
+                </svg>
+              </div>
+              <div class="login-brand-sub">AI-Powered Option Chain Intelligence</div>
+            </div>
+          </div>
+
+          <div class="login-features">
+            &#128200; Live Market Analytics<br/>
+            &#129504; AI-Powered Options Insights<br/>
+            &#128293; Real-Time OI Tracking
+          </div>
+
+          <div class="login-btn-wrap">
             <a href="{login_url}" target="_self">
-                <button class="login-btn">&#128272; Login with Zerodha</button>
+              <button class="login-btn">&#128272; Login with Zerodha</button>
             </a>
+          </div>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -262,10 +428,9 @@ if not st.session_state["logged_in"]:
 
     st.stop()
 
-# ================= MAIN APP =================
-st.title("📊 PulseIQ Dashboard")
-
-# ================= SIDEBAR =================
+# ================= SIDEBAR LOGO =================
+st.sidebar.markdown(LOGO_HTML, unsafe_allow_html=True)
+st.sidebar.markdown("---")
 st.sidebar.header("⚙ Settings")
 
 auto_refresh = st.sidebar.checkbox(
@@ -277,7 +442,6 @@ auto_refresh = st.sidebar.checkbox(
 if st.sidebar.button("Logout"):
 
     clear_token()
-
     st.session_state["logged_in"] = False
     st.session_state["validated"] = False
 
@@ -291,6 +455,10 @@ if auto_refresh:
         interval=60 * 1000,
         key="live_refresh"
     )
+
+# ================= DASHBOARD LOGO =================
+st.markdown(LOGO_HTML, unsafe_allow_html=True)
+st.markdown("---")
 
 # ================= CACHE DATA =================
 @st.cache_data(ttl=30)
