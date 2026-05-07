@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 from kiteconnect import KiteConnect
 from streamlit_autorefresh import st_autorefresh
 from supabase import create_client
+import streamlit.components.v1 as components
 
 from kite_fetch import fetch_option_chain
 from analysis import calculate_metrics
@@ -60,12 +61,12 @@ LOGO_HTML = """
     100% { width:110px; height:110px; opacity:0;   }
 }
 @keyframes boltFlicker {
-    0%,100% { opacity:1;   filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }
-    88%     { opacity:1;   }
+    0%,100% { opacity:1; filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }
+    88%     { opacity:1; }
     89%     { opacity:0.4; filter: drop-shadow(0 0 2px #00cfff); }
-    90%     { opacity:1;   }
+    90%     { opacity:1; }
     94%     { opacity:0.7; }
-    95%     { opacity:1;   }
+    95%     { opacity:1; }
 }
 .brand-name {
     font-size: 48px !important;
@@ -287,16 +288,22 @@ if not st.session_state["logged_in"]:
 
     login_url = kite.login_url()
 
-    st.markdown(
+    components.html(
         f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
         <style>
-        .login-page-wrap {{
+        * {{ margin:0; padding:0; box-sizing:border-box; }}
+        body {{
+            background: transparent;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 80vh;
+            min-height: 100vh;
             gap: 32px;
+            font-family: Arial, sans-serif;
         }}
         .login-logo-row {{
             display: flex;
@@ -337,12 +344,12 @@ if not st.session_state["logged_in"]:
             animation: lnBoltFlicker 3s ease-in-out infinite;
         }}
         @keyframes lnBoltFlicker {{
-            0%,100% {{ opacity:1;   filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }}
-            88%     {{ opacity:1;   }}
+            0%,100% {{ opacity:1; filter: drop-shadow(0 0 4px #00cfff) drop-shadow(0 0 14px #00cfff) drop-shadow(0 0 35px #0099ff) drop-shadow(0 0 70px #006fff); }}
+            88%     {{ opacity:1; }}
             89%     {{ opacity:0.4; filter: drop-shadow(0 0 2px #00cfff); }}
-            90%     {{ opacity:1;   }}
+            90%     {{ opacity:1; }}
             94%     {{ opacity:0.7; }}
-            95%     {{ opacity:1;   }}
+            95%     {{ opacity:1; }}
         }}
         .ln-spark {{
             position: absolute;
@@ -359,7 +366,7 @@ if not st.session_state["logged_in"]:
         .ln-spark:nth-child(8) {{ top:80%; left:12%; animation-delay:1.9s; }}
         .ln-spark:nth-child(9) {{ top:45%; left:92%; animation-delay:2.4s; }}
         @keyframes lnSpark {{
-            0%   {{ opacity:0; transform:translate(0,0) scale(1);   }}
+            0%   {{ opacity:0; transform:translate(0,0) scale(1); }}
             30%  {{ opacity:1; }}
             100% {{ opacity:0; transform:translate(20px,-20px) scale(0); }}
         }}
@@ -369,10 +376,10 @@ if not st.session_state["logged_in"]:
             gap: 4px;
         }}
         .ln-brand-name {{
-            font-size: 82px !important;
+            font-size: 82px;
             font-weight: 900;
             font-style: italic;
-            color: #ffffff !important;
+            color: #ffffff;
             letter-spacing: -2px;
             line-height: 1;
             text-shadow:
@@ -399,23 +406,23 @@ if not st.session_state["logged_in"]:
             50%      {{ opacity:0.5; filter: drop-shadow(0 0 10px #00cfff) drop-shadow(0 0 20px #0099ff); }}
         }}
         .ln-brand-sub {{
-            font-size: 12px !important;
+            font-size: 12px;
             letter-spacing: 4px;
-            color: #00cfff !important;
+            color: #00cfff;
             text-transform: uppercase;
             opacity: 0.8;
             text-shadow: 0 0 10px #00cfff;
         }}
         .login-features {{
-            font-size: 18px !important;
-            color: rgba(255,255,255,0.88) !important;
+            font-size: 18px;
+            color: rgba(255,255,255,0.88);
             line-height: 2.4;
             text-align: center;
             text-shadow: 0 0 12px rgba(0,0,0,0.8);
         }}
         .login-btn {{
             background: rgba(37,99,235,0.92);
-            color: white !important;
+            color: white;
             padding: 14px 40px;
             border: none;
             border-radius: 12px;
@@ -424,26 +431,23 @@ if not st.session_state["logged_in"]:
             cursor: pointer;
             letter-spacing: 1px;
             box-shadow: 0 0 24px rgba(37,99,235,0.55);
+            text-decoration: none;
+            display: inline-block;
         }}
         .login-btn:hover {{ opacity: 0.88; }}
         </style>
-
-        <div class="login-page-wrap">
+        </head>
+        <body>
 
           <div class="login-logo-row">
-
             <div class="ln-bolt-wrap">
               <div class="ln-bolt-ring"></div>
               <div class="ln-bolt-ring"></div>
               <div class="ln-bolt-ring"></div>
               <svg class="ln-bolt-svg" width="90" height="115"
                 viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
-                <polygon
-                  points="38,2 14,42 30,42 22,78 46,38 30,38"
-                  fill="#00cfff"
-                  stroke="#ffffff"
-                  stroke-width="1"
-                />
+                <polygon points="38,2 14,42 30,42 22,78 46,38 30,38"
+                  fill="#00cfff" stroke="#ffffff" stroke-width="1"/>
               </svg>
               <div class="ln-spark"></div>
               <div class="ln-spark"></div>
@@ -451,7 +455,6 @@ if not st.session_state["logged_in"]:
               <div class="ln-spark"></div>
               <div class="ln-spark"></div>
             </div>
-
             <div class="ln-text-col">
               <div class="ln-brand-name">
                 PulseIQ
@@ -467,7 +470,6 @@ if not st.session_state["logged_in"]:
               </div>
               <div class="ln-brand-sub">AI-Powered Option Chain Intelligence</div>
             </div>
-
           </div>
 
           <div class="login-features">
@@ -476,13 +478,14 @@ if not st.session_state["logged_in"]:
             &#128293; Real-Time OI Tracking
           </div>
 
-          <a href="{login_url}" target="_self" style="text-decoration:none;">
-            <button class="login-btn">&#128272; Login with Zerodha</button>
+          <a href="{login_url}" target="_top" class="login-btn">
+            &#128272; Login with Zerodha
           </a>
 
-        </div>
+        </body>
+        </html>
         """,
-        unsafe_allow_html=True
+        height=500,
     )
 
     st.stop()
